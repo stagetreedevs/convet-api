@@ -13,6 +13,7 @@ import { AuthService } from './auth/auth.service';
 import { SchoolSubjectModule } from './controllers/school_subject/school_subject.module';
 import { RegisterModule } from './controllers/register/register.module';
 import { QuestionModule } from './controllers/question/question.module';
+import { SwaggerModule } from '@nestjs/swagger';
 @Module({
   imports: [
     UserModule,
@@ -37,6 +38,7 @@ import { QuestionModule } from './controllers/question/question.module';
       secret: 'mySecretKey',
       signOptions: { expiresIn: '24h' },
     }),
+    SwaggerModule,
     AuthModule
   ],
   controllers: [AppController],
