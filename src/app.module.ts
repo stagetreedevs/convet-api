@@ -10,9 +10,15 @@ import { environment } from './environment';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth/auth.service';
+import { SchoolSubjectModule } from './controllers/school_subject/school_subject.module';
+import { RegisterModule } from './controllers/register/register.module';
+import { QuestionModule } from './controllers/question/question.module';
 @Module({
   imports: [
     UserModule,
+    SchoolSubjectModule,
+    RegisterModule,
+    QuestionModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: environment.PG_HOST,
