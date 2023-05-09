@@ -1,9 +1,10 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
-
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 @Injectable()
 export class UserService {
   constructor(
@@ -47,4 +48,21 @@ export class UserService {
   async remove(id: string): Promise<void> {
     await this.userRepository.delete(id);
   }
+
+  async upload(username: any, file: Express.Multer.File) {
+    const storage = getStorage();
+    const { originalname } = file;
+    const { mimetype } = file;
+    const type = mimetype.split('/').join('.');
+    const metadata = {
+        contentType: `${type}`,
+    };
+    const fileRef = ref(storage, `${username.username}/${originalname}`);
+    const uploaded = await uploadBytes(fileRef, file.buffer, metadata);
+    const link = {
+        url: ""
+    }
+    link.url = await getDownloadURL(uploaded.ref).then((url) => { return url });
+    return link;
+}
 }

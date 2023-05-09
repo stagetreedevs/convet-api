@@ -1,9 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseInterceptors, Query, UploadedFile } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UserDto } from './user.dto';
 import { User } from './user.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
 @ApiTags('Usuários')
 @Controller('user')
 export class UserController {
@@ -38,5 +39,12 @@ export class UserController {
   @ApiOperation({ summary: 'DELETAR USUÁRIO', description: 'PASSE COMO PARAMETRO O ID E DELETE UM USUÁRIO.' })
   async remove(@Param('id') id: string): Promise<void> {
     return this.userService.remove(id);
+  }
+
+  @Post('upload/')
+  @ApiOperation({ summary: 'Upload firebase', description: 'PASSE COMO PARAMETRO O EMAIL DO USUÁRIO E A IMAGEM(ARQUIVO FILE), PARA REALIZAR O UPLOAD NO FIREBASE STORAGE.' })
+  @UseInterceptors(FileInterceptor('file'))
+  async upload(@Query() username: any, @UploadedFile() file){
+    return this.userService.upload(username, file);
   }
 }
