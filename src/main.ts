@@ -27,24 +27,24 @@ async function bootstrap() {
   initializeApp(firebaseConfig);
 
   const app = await NestFactory.create(AppModule);
-  // const config = new DocumentBuilder()
-  //   .setTitle('CONVET API')
-  //   .setDescription('Convet API - Todos os endpoints da aplicação')
-  //   .setVersion('1.0')
-  //   .addTag('app')
-  //   .build();
-  // const document = SwaggerModule.createDocument(app, config);
-  // SwaggerModule.setup('api', app, document, {
-  //   customJs: [
-  //     'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui-bundle.min.js',
-  //     'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui-standalone-preset.min.js',
-  //   ],
-  //   customCssUrl: [
-  //     'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui.min.css',
-  //     // 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui-standalone-preset.min.css',
-  //     'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui.css',
-  //   ],
-  // });
+  const config = new DocumentBuilder()
+    .setTitle('CONVET API')
+    .setDescription('Convet API - Todos os endpoints da aplicação')
+    .setVersion('1.0')
+    .addTag('app')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document, {
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui-bundle.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui-standalone-preset.min.js',
+    ],
+    customCssUrl: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui.min.css',
+      // 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui-standalone-preset.min.css',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui.css',
+    ],
+  });
 
   app.enableCors()
   await app.listen(environment.PORT);
