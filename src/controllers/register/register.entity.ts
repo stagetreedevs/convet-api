@@ -49,13 +49,13 @@ export class Register {
   progress: number;
   
   @Column({default: null})
-  pages_read: number;
+  pages_read: string;
   
   @Column({default: null})
-  last_page: number;
+  last_page: string;
   
   @Column({default: null})
-  revision_number: number;
+  revision_number: string;
 
   constructor(
     type: string,
@@ -68,9 +68,9 @@ export class Register {
     duration: Date,
     notes: string,
     progress: number,
-    pages_read: number,
-    last_page: number,
-    revision_number: number
+    pages_read: string,
+    last_page: string,
+    revision_number: string
     ) {
     this.type = type;
     this.school_subject_name = school_subject_name;
