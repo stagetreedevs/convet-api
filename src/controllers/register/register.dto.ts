@@ -34,10 +34,22 @@ export class RegisterDto {
     
     @ApiProperty()
     pages_read: number;
+
+    @ApiProperty()
+    last_page_read: string;
     
     @ApiProperty()
     last_page: number;
     
     @ApiProperty()
     revision_number: number;
+
+    @ApiProperty()
+    videos_watched: number;
+
+    @ApiProperty()
+    qtd_questions: number;
+    
+    @ApiProperty()
+    questions_hits: number;
 }
