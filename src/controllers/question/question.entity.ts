@@ -6,7 +6,7 @@ export class Question {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ default: null })
   user: string;
 
   @Column()
