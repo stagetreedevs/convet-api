@@ -4,6 +4,10 @@ import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RegisterService } from './register.service';
 import { RegisterDto } from './register.dto';
 import { Register } from './register.entity';
+interface PartialRegister {
+  type_school_subject: string;
+  duration: string;
+}
 @ApiTags('Registro')
 @Controller('registro')
 export class RegisterController {
@@ -26,6 +30,41 @@ export class RegisterController {
   @ApiOperation({ summary: 'BUSCAR REGISTROS DE UM USUÁRIO ESPECÍFICO, PASSANDO SEU ID', description: 'PASSE O ID DO USUÁRIO E RETORNA OS REGISTROS DO MESMO.' })
   async findUser(@Param('id') id: string): Promise<Register[]> {
     return this.registerService.findUser(id);
+  }
+
+  @Get('all/:user_id')
+  @ApiOperation({ summary: 'RETORNA TODAS HORAS REGISTRADAS NO SISTEMA', description: 'PASSE O ID DO USUÁRIO E RETORNA O TEMPO DE DURAÇÃO DE ESTUDO PARA CADA TIPO DE REGISTRO.' })
+  async getAllHours(@Param('user_id') user_id: string): Promise<PartialRegister[]> {
+    const hours = await this.registerService.allHours(user_id);
+    return hours;
+  }
+
+  @Get('year/:user_id')
+  @ApiOperation({ summary: 'RETORNA TODAS HORAS REGISTRADAS NO ANO ATUAL', description: 'PASSE O ID DO USUÁRIO E RETORNA O TEMPO DE DURAÇÃO DE ESTUDO PARA CADA TIPO DE REGISTRO.' })
+  async getEverYear(@Param('user_id') user_id: string): Promise<PartialRegister[]> {
+    const hours = await this.registerService.everYear(user_id);
+    return hours;
+  }
+
+  @Get('month/:user_id')
+  @ApiOperation({ summary: 'RETORNA TODAS HORAS REGISTRADAS NO MÊS ATUAL', description: 'PASSE O ID DO USUÁRIO E RETORNA O TEMPO DE DURAÇÃO DE ESTUDO PARA CADA TIPO DE REGISTRO.' })
+  async getCurrentMonth(@Param('user_id') user_id: string): Promise<PartialRegister[]> {
+    const hours = await this.registerService.currentMonth(user_id);
+    return hours;
+  }
+
+  @Get('week/:user_id')
+  @ApiOperation({ summary: 'RETORNA TODAS HORAS REGISTRADAS NA SEMANA ATUAL', description: 'PASSE O ID DO USUÁRIO E RETORNA O TEMPO DE DURAÇÃO DE ESTUDO PARA CADA TIPO DE REGISTRO.' })
+  async getCurrentWeek(@Param('user_id') user_id: string): Promise<PartialRegister[]> {
+    const hours = await this.registerService.currentWeek(user_id);
+    return hours;
+  }
+
+  @Get('day/:user_id')
+  @ApiOperation({ summary: 'RETORNA TODAS HORAS REGISTRADAS NO DIA ATUAL', description: 'PASSE O ID DO USUÁRIO E RETORNA O TEMPO DE DURAÇÃO DE ESTUDO PARA CADA TIPO DE REGISTRO.' })
+  async getCurrentDay(@Param('user_id') user_id: string): Promise<PartialRegister[]> {
+    const hours = await this.registerService.currentDay(user_id);
+    return hours;
   }
 
   @Get(':id')
