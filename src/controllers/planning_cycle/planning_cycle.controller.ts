@@ -18,9 +18,15 @@ export class PlanningCycleController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'TODOS CICLOS DE PLANEJAMENTOS', description: 'RETORNA TODAS OS CICLOS DE PLANEJAMENTOS DO SISTEMA.' })
+  @ApiOperation({ summary: 'TODOS CICLOS DE PLANEJAMENTO', description: 'RETORNA TODAS OS CICLOS DE PLANEJAMENTO DO SISTEMA.' })
   async findAll(): Promise<PlanningCycle[]> {
     return this.ciclyService.findAll();
+  }
+
+  @Get('user/:id')
+  @ApiOperation({ summary: 'BUSCAR CICLOS DE PLANEJAMENTO DE UM USUÁRIO ESPECÍFICO, PASSANDO SEU ID', description: 'PASSE O ID DO USUÁRIO E RETORNA O CICLOS DE PLANEJAMENTO DO MESMO.' })
+  async findUser(@Param('id') id: string): Promise<PlanningCycle[]> {
+    return this.ciclyService.findUser(id);
   }
 
   @Get(':id')

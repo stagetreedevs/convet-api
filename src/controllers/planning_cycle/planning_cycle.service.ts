@@ -18,6 +18,14 @@ export class PlanningCycleService {
     return this.cycleService.find();
   }
 
+  async findUser(user_id: string): Promise<PlanningCycle[]> {
+    return this.cycleService.find({
+      where: {
+        user: user_id,
+      },
+    });
+  }  
+
   async findOne(id: string): Promise<PlanningCycle> {
     return this.cycleService.findOne({
       where: {

@@ -7,7 +7,7 @@ import { Register } from './register.entity';
 @ApiTags('Registro')
 @Controller('registro')
 export class RegisterController {
-  constructor(private readonly registerService: RegisterService) {}
+  constructor(private readonly registerService: RegisterService) { }
 
   @Post()
   @ApiOperation({ summary: 'CRIAR REGISTRO', description: 'PASSE O BODY PREENCHIDO E CRIE UM NOVO REGISTRO.' })
@@ -20,6 +20,12 @@ export class RegisterController {
   @ApiOperation({ summary: 'TODOS REGISTROS', description: 'RETORNA TODAS OS REGISTROS DO SISTEMA.' })
   async findAll(): Promise<Register[]> {
     return this.registerService.findAll();
+  }
+
+  @Get('user/:id')
+  @ApiOperation({ summary: 'BUSCAR REGISTROS DE UM USUÁRIO ESPECÍFICO, PASSANDO SEU ID', description: 'PASSE O ID DO USUÁRIO E RETORNA OS REGISTROS DO MESMO.' })
+  async findUser(@Param('id') id: string): Promise<Register[]> {
+    return this.registerService.findUser(id);
   }
 
   @Get(':id')

@@ -22,6 +22,12 @@ export class QuestionController {
     return this.questionService.findAll();
   }
 
+  @Get('user/:id')
+  @ApiOperation({ summary: 'BUSCAR AS QUESTÕES DE UM USUÁRIO ESPECÍFICO, PASSANDO SEU ID', description: 'PASSE O ID DO USUÁRIO E RETORNA As QUESTÕES DO MESMO.' })
+  async findUser(@Param('id') id: string): Promise<Question[]> {
+    return this.questionService.findUser(id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'BUSCAR QUESTÃO ID', description: 'PASSE O ID CORRETO E RETORNA A QUESTÃO DESEJADA.' })
   async findOne(@Param('id') id: string): Promise<Question> {

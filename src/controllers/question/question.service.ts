@@ -9,7 +9,7 @@ export class QuestionService {
   constructor(
     @InjectRepository(Question)
     private readonly questionRepository: Repository<Question>,
-  ) {}
+  ) { }
 
   async create(quest: Question): Promise<Question> {
     return this.questionRepository.save(quest);
@@ -19,20 +19,28 @@ export class QuestionService {
     return this.questionRepository.find();
   }
 
+  async findUser(user_id: string): Promise<Question[]> {
+    return this.questionRepository.find({
+      where: {
+        user: user_id,
+      },
+    });
+  }  
+
   async findOne(id: string): Promise<Question> {
     return this.questionRepository.findOne({
-        where: {
-            id: id,
-        }
+      where: {
+        id: id,
+      }
     });
   }
 
   async update(id: string, quest: Question): Promise<Question> {
     await this.questionRepository.update(id, quest);
     return this.questionRepository.findOne({
-        where: {
-            id: id,
-        }
+      where: {
+        id: id,
+      }
     });
   }
 
