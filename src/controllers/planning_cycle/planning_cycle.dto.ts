@@ -1,7 +1,9 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-
 export class PlanningCycleDto {
+    @ApiProperty()
+    user: string;
+
     @ApiProperty()
     school_subject_code: string;
     

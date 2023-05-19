@@ -1,11 +1,13 @@
 /* eslint-disable prettier/prettier */
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-
 @Entity()
 export class Question {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column()
+  user: string;
 
   @Column()
   school_subject_name: string;
@@ -22,7 +24,8 @@ export class Question {
   @Column({default: null})
   comments: string;
 
-  constructor(school_subject_name: string, content: string, quantity: number, hits: number, comments: string) {
+  constructor(user: string, school_subject_name: string, content: string, quantity: number, hits: number, comments: string) {
+    this.user = user;
     this.school_subject_name = school_subject_name;
     this.content = content;
     this.quantity = quantity;

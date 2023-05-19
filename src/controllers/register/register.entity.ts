@@ -7,6 +7,9 @@ export class Register {
   id: string;
 
   @Column()
+  user: string;
+
+  @Column()
   type: string;
 
   @Column()
@@ -70,6 +73,7 @@ export class Register {
   questions_hits: string;
 
   constructor(
+    user: string,
     type: string,
     school_subject_name: string,
     type_school_subject: string,
@@ -88,6 +92,7 @@ export class Register {
     qtd_questions: string,
     questions_hits: string
   ) {
+    this.user = user;
     this.type = type;
     this.school_subject_name = school_subject_name;
     this.type_school_subject = type_school_subject;

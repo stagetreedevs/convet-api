@@ -1,9 +1,11 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-
 export class RegisterDto {
     @ApiProperty()
     type: string;
+
+    @ApiProperty()
+    user: string;
     
     @ApiProperty()
     school_subject_name: string;

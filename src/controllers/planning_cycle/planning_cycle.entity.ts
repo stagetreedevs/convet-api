@@ -7,6 +7,9 @@ export class PlanningCycle {
   id: string;
 
   @Column()
+  user: string;
+
+  @Column()
   school_subject_code: string;
 
   @Column()
@@ -43,6 +46,7 @@ export class PlanningCycle {
   study_time: Date;
 
   constructor(
+    user: string,
     school_subject_code: string,
     school_subject_name: string,
     progress: string,
@@ -55,6 +59,7 @@ export class PlanningCycle {
     questions_hits: string,
     study_time: Date,
   ) {
+    this.user = user;
     this.school_subject_code = school_subject_code;
     this.school_subject_name = school_subject_name;
     this.progress = progress;
