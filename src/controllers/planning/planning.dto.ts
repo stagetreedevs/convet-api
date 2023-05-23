@@ -3,6 +3,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class PlanningDto {
     @ApiProperty()
+    user: string;
+
+    @ApiProperty()
     school_subject_code: string;
 
     @ApiProperty()

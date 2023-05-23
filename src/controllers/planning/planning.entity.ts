@@ -6,6 +6,9 @@ export class Planning {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ default: null })
+  user: string;
+
   @Column()
   school_subject_code: string;
 
@@ -22,12 +25,14 @@ export class Planning {
   total_pg: string;
 
   constructor(
+    user: string,
     school_subject_code: string,
     school_subject_name: string,
     qtd_hours: string,
     qtd_videos: string,
     total_pg: string
   ) {
+    this.user = user;
     this.school_subject_code = school_subject_code;
     this.school_subject_name = school_subject_name;
     this.qtd_hours = qtd_hours;

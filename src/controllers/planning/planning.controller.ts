@@ -28,6 +28,12 @@ export class PlanningController {
     return this.planningService.findOne(id);
   }
 
+  @Get('user/:id')
+  @ApiOperation({ summary: 'BUSCAR PLANEJAMENTOS DE UM USUÁRIO ESPECÍFICO, PASSANDO SEU ID', description: 'PASSE O ID DO USUÁRIO E RETORNA OS PLANEJAMENTOS DO MESMO.' })
+  async findUser(@Param('id') id: string): Promise<Planning[]> {
+    return this.planningService.findByUser(id);
+  }
+
   @Put(':id')
   @ApiOperation({ summary: 'EDITAR PLANEJAMENTO', description: 'PASSE O ID CORRETO JUNTO DE UM BODY E RETORNA O PLANEJAMENTO ATUALIZADO.' })
   async update(@Param('id') id: string, @Body() planning: Planning): Promise<Planning> {

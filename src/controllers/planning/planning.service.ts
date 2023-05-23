@@ -26,6 +26,14 @@ export class PlanningService {
     });
   }
 
+  async findByUser(user_id: string): Promise<Planning[]> {
+    return await this.planningRepository.find({
+      where: {
+        user: user_id,
+      },
+    });
+  }
+
   async update(id: string, pln: Planning): Promise<Planning> {
     await this.planningRepository.update(id, pln);
     return this.planningRepository.findOne({

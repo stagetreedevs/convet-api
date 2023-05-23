@@ -16,6 +16,7 @@ import { QuestionModule } from './controllers/question/question.module';
 import { PlanningModule } from './controllers/planning/planning.module';
 import { PlanningCycleModule } from './controllers/planning_cycle/planning_cycle.module';
 import { SwaggerModule } from '@nestjs/swagger';
+import { ObservationModule } from './controllers/observation/observation.module';
 @Module({
   imports: [
     UserModule,
@@ -24,6 +25,7 @@ import { SwaggerModule } from '@nestjs/swagger';
     QuestionModule,
     PlanningModule,
     PlanningCycleModule,
+    ObservationModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: environment.PG_HOST,
