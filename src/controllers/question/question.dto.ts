@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-
 export class QuestionDto {
     @ApiProperty()
     user: string;
@@ -16,7 +15,13 @@ export class QuestionDto {
   
     @ApiProperty()
     hits: number;
+
+    @ApiProperty()
+    mistakes: number;
   
     @ApiProperty()
     comments: string;
+
+    @ApiProperty()
+    created_date: Date;
 }

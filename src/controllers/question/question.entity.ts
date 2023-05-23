@@ -21,16 +21,24 @@ export class Question {
   @Column()
   hits: number;
 
+  @Column({ default: null })
+  mistakes: number;
+
   @Column({default: null})
   comments: string;
 
-  constructor(user: string, school_subject_name: string, content: string, quantity: number, hits: number, comments: string) {
+  @Column({ type: 'date', default: () => 'now()' })
+  created_date: Date;
+
+  constructor(user: string, school_subject_name: string, content: string, quantity: number, hits: number, mistakes: number, comments: string, created_date: Date) {
     this.user = user;
     this.school_subject_name = school_subject_name;
     this.content = content;
     this.quantity = quantity;
     this.hits = hits;
+    this.mistakes = mistakes;
     this.comments = comments;
+    this.created_date = created_date;
     this.id = uuidv4();
   }
 }
