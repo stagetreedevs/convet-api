@@ -45,4 +45,39 @@ export class QuestionController {
   async remove(@Param('id') id: string): Promise<void> {
     return this.questionService.remove(id);
   }
+
+  @Get('all/:user_id')
+  @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E RETORNA OS DADOS.' })
+  async getAll(@Param('user_id') user_id: string): Promise<any[]> {
+    const hours = await this.questionService.allAnswers(user_id);
+    return hours;
+  }
+
+  @Get('year/:user_id')
+  @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES DO ANO ATUAL', description: 'PASSE O ID DO USUÁRIO E RETORNA OS DADOS.' })
+  async getYear(@Param('user_id') user_id: string): Promise<any[]> {
+    const hours = await this.questionService.yearAnswers(user_id);
+    return hours;
+  }
+  
+  @Get('month/:user_id')
+  @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES DO MÊS ATUAL', description: 'PASSE O ID DO USUÁRIO E RETORNA OS DADOS.' })
+  async getMonth(@Param('user_id') user_id: string): Promise<any[]> {
+    const hours = await this.questionService.monthAnswers(user_id);
+    return hours;
+  }
+
+  @Get('week/:user_id')
+  @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES DA SEMANA ATUAL', description: 'PASSE O ID DO USUÁRIO E RETORNA OS DADOS.' })
+  async getWeek(@Param('user_id') user_id: string): Promise<any[]> {
+    const hours = await this.questionService.weekAnswers(user_id);
+    return hours;
+  }
+
+  @Get('day/:user_id')
+  @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES DO DIA ATUAL', description: 'PASSE O ID DO USUÁRIO E RETORNA OS DADOS.' })
+  async getDay(@Param('user_id') user_id: string): Promise<any[]> {
+    const hours = await this.questionService.dayAnswers(user_id);
+    return hours;
+  }
 }
