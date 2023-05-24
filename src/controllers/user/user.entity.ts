@@ -10,14 +10,18 @@ export class User {
   @Column()
   name: string;
 
+  @Column({ default: null})
+  phone: string;
+
   @Column()
   email: string;
 
   @Column()
   password: string;
 
-  constructor(name: string, email: string, password: string) {
+  constructor(name: string, phone: string, email: string, password: string) {
     this.name = name;
+    this.phone = phone;
     this.email = email;
     this.password = password;
     this.id = uuidv4();
