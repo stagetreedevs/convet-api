@@ -13,8 +13,14 @@ export class QuestionService {
   ) { }
 
   async create(quest: Question): Promise<Question> {
-    return this.questionRepository.save(quest);
+    const aux: number = quest.quantity - quest.hits;
+    const questionWithMistakes: Question = {
+      ...quest,
+      mistakes: aux
+    };
+    return this.questionRepository.save(questionWithMistakes);
   }
+
 
   async findAll(): Promise<Question[]> {
     return this.questionRepository.find();
@@ -49,10 +55,11 @@ export class QuestionService {
     await this.questionRepository.delete(id);
   }
 
-  async allAnswers(user_id: string): Promise<any> {
+  async allAnswers(user_id: string, materia: string): Promise<any> {
     const questions = await this.questionRepository.find({
       where: {
         user: user_id,
+        school_subject_name: materia
       },
       select: ['hits', 'mistakes'],
     });
@@ -73,13 +80,14 @@ export class QuestionService {
     };
   }
 
-  async yearAnswers(user_id: string): Promise<any> {
+  async yearAnswers(user_id: string, materia: string): Promise<any> {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
 
     const questions = await this.questionRepository.find({
       where: {
         user: user_id,
+        school_subject_name: materia,
         created_date: Raw(alias => `${alias} >= '${currentYear}-01-01'`),
       },
       select: ['hits', 'mistakes'],
@@ -101,7 +109,7 @@ export class QuestionService {
     };
   }
 
-  async monthAnswers(user_id: string): Promise<any> {
+  async monthAnswers(user_id: string, materia: string): Promise<any> {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth() + 1; // Os meses são indexados a partir de 0, então adicionamos 1 para obter o mês atual
@@ -111,6 +119,7 @@ export class QuestionService {
     const questions = await this.questionRepository.find({
       where: {
         user: user_id,
+        school_subject_name: materia,
         created_date: Between(startOfMonth, endOfMonth),
       },
       select: ['hits', 'mistakes'],
@@ -132,7 +141,7 @@ export class QuestionService {
     };
   }
 
-  async weekAnswers(user_id: string): Promise<any> {
+  async weekAnswers(user_id: string, materia: string): Promise<any> {
     const currentDate = new Date();
     const startOfWeekDate = startOfWeek(currentDate);
     const endOfWeekDate = endOfWeek(currentDate);
@@ -140,6 +149,7 @@ export class QuestionService {
     const questions = await this.questionRepository.find({
       where: {
         user: user_id,
+        school_subject_name: materia,
         created_date: Between(startOfWeekDate, endOfWeekDate),
       },
       select: ['hits', 'mistakes'],
@@ -161,7 +171,7 @@ export class QuestionService {
     };
   }
 
-  async dayAnswers(user_id: string): Promise<any> {
+  async dayAnswers(user_id: string, materia: string): Promise<any> {
     const currentDate = new Date();
     const startOfDayDate = startOfDay(currentDate);
     const endOfDayDate = endOfDay(currentDate);
@@ -169,6 +179,7 @@ export class QuestionService {
     const questions = await this.questionRepository.find({
       where: {
         user: user_id,
+        school_subject_name: materia,
         created_date: Between(startOfDayDate, endOfDayDate),
       },
       select: ['hits', 'mistakes'],

@@ -16,8 +16,27 @@ export class RegisterService {
   ) { }
 
   async create(register: Register): Promise<Register> {
+    const startSeconds = this.convertDurationToSeconds(register.start_time);
+    const endSeconds = this.convertDurationToSeconds(register.end_time);
+    const durationSeconds = endSeconds - startSeconds;
+    const hours = Math.floor(durationSeconds / 3600);
+    const minutes = Math.floor((durationSeconds % 3600) / 60);
+    const seconds = durationSeconds % 60;
+    const duration = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    register.duration = duration;
+  
+    const lastPage = parseInt(register.last_page);
+    const pagesRead = parseInt(register.pages_read);
+    const percentageRead = (pagesRead / lastPage) * 100;
+    const roundedPercentage = percentageRead.toFixed(2);
+    register.progress = roundedPercentage.toString(); // Converter para string e atribuir a register.progress
+  
+    // console.log(register)
+    // return null;
     return this.regRepository.save(register);
   }
+  
+  
 
   async findAll(): Promise<Register[]> {
     return this.regRepository.find();
@@ -218,7 +237,6 @@ export class RegisterService {
 
     return result;
   }
-
 
   //AUXILIARES PARA SOMA DE TEMPO
   private convertDurationToSeconds(duration: string | Date): number {

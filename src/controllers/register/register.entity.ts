@@ -43,13 +43,13 @@ export class Register {
     type: 'time',
     default: () => "'00:00:00'",
   })
-  duration: Date;
+  duration: string;
 
   @Column({ default: null })
   notes: string;
 
   @Column({ default: null })
-  progress: number;
+  progress: string;
 
   @Column({ default: null })
   pages_read: string;
@@ -81,9 +81,9 @@ export class Register {
     start_date: Date,
     start_time: Date,
     end_time: Date,
-    duration: Date,
+    duration: string,
     notes: string,
-    progress: number,
+    progress: string,
     pages_read: string,
     last_page_read: string,
     last_page: string,
