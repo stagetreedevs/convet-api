@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { AdminModule } from './controllers/admin/admin.module';
 import { UserModule } from './controllers/user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -19,6 +20,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { ObservationModule } from './controllers/observation/observation.module';
 @Module({
   imports: [
+    AdminModule,
     UserModule,
     SchoolSubjectModule,
     RegisterModule,
@@ -29,7 +31,7 @@ import { ObservationModule } from './controllers/observation/observation.module'
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: environment.PG_HOST,
-      port: environment.PG_PORT ,
+      port: environment.PG_PORT,
       username: environment.PG_USER,
       password: environment.PG_PASSWORD,
       database: environment.PG_DATABASE,
@@ -48,6 +50,9 @@ import { ObservationModule } from './controllers/observation/observation.module'
     AuthModule
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService],
+  providers: [
+    AppService,
+    AuthService
+  ]
 })
 export class AppModule { }

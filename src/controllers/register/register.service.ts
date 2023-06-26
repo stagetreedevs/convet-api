@@ -31,8 +31,6 @@ export class RegisterService {
     const roundedPercentage = percentageRead.toFixed(2);
     register.progress = roundedPercentage.toString(); // Converter para string e atribuir a register.progress
   
-    // console.log(register)
-    // return null;
     return this.regRepository.save(register);
   }
   
