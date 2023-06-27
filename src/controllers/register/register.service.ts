@@ -24,38 +24,74 @@ export class RegisterService {
     const seconds = durationSeconds % 60;
     const duration = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     register.duration = duration;
-  
+
     const lastPage = parseInt(register.last_page);
     const pagesRead = parseInt(register.pages_read);
     const percentageRead = (pagesRead / lastPage) * 100;
     const roundedPercentage = percentageRead.toFixed(2);
     register.progress = roundedPercentage.toString(); // Converter para string e atribuir a register.progress
-  
+
     return this.regRepository.save(register);
   }
-  
-  
+
+
 
   async findAll(): Promise<Register[]> {
     return this.regRepository.find();
   }
 
   async findUser(user_id: string): Promise<Register[]> {
-    const a = await this.regRepository.find({
-      where: {
-        user: user_id,
-      },
-    });
-    const anoAtual = new Date().getFullYear();
-
-    console.log(anoAtual);
-    console.log(typeof (a[0].start_date));
-
     return this.regRepository.find({
       where: {
         user: user_id,
       },
     });
+  }
+
+  async averageTime(user_id: string, materia: string): Promise<any[]> {
+    const verify: any = await this.regRepository.find({
+      where: {
+        user: user_id,
+        school_subject_name: materia
+      },
+    });
+
+    console.log(verify);
+    if (verify.qtd_questions == '0') {
+      return [];
+    }
+
+    else {
+      const result = await this.regRepository.createQueryBuilder("register")
+        .select("TO_CHAR(DATE_TRUNC('month', register.start_date)::date, 'YYYY-MM')", "month")
+        .addSelect("DATE_PART('year', register.start_date)::integer", "year")
+        .addSelect("AVG(EXTRACT(EPOCH FROM register.duration))", "avg_duration")
+        .where("register.user = :user_id", { user_id })
+        .andWhere("register.school_subject_name = :materia", { materia })
+        .groupBy("month, year")
+        .orderBy("month", "ASC")
+        .getRawMany();
+
+      // Mapear o resultado para um array de objetos
+      const groupedResults: any[] = [];
+      result.forEach(item => {
+        const month = item.month;
+        const year = item.year;
+        const avgDurationSeconds = parseFloat(item.avg_duration);
+        const avgDurationMinutes = avgDurationSeconds / 60;
+        const avgDurationFormatted = avgDurationMinutes.toFixed(2);
+        const durationUnit = avgDurationMinutes >= 60 ? 'horas' : 'minutos';
+
+        groupedResults.push({
+          month: month,
+          year: year,
+          avgDuration: `${avgDurationFormatted} ${durationUnit}`
+        });
+      });
+
+      return groupedResults;
+
+    }
   }
 
   // CALCULA PARA TODOS OS REGISTROS

@@ -9,6 +9,9 @@ export class RegisterDto {
     
     @ApiProperty()
     school_subject_name: string;
+
+    @ApiProperty()
+    school_subject_code: string;
     
     @ApiProperty()
     type_school_subject: string;

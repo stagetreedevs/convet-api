@@ -39,6 +39,15 @@ export class RegisterController {
     return hours;
   }
 
+  @Get('times/:user_id/:materia')
+  @ApiOperation({ summary: 'RETORNA TEMPO MÉDIO DAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E O NOME DA MATÉRIA.' })
+  async getAverageTime(
+    @Param('user_id') user_id: string,
+    @Param('materia') materia: string,
+  ): Promise<any[]> {
+    return this.registerService.averageTime(user_id, materia);
+  }
+
   @Get('year/:user_id')
   @ApiOperation({ summary: 'RETORNA TODAS HORAS REGISTRADAS NO ANO ATUAL', description: 'PASSE O ID DO USUÁRIO E RETORNA O TEMPO DE DURAÇÃO DE ESTUDO PARA CADA TIPO DE REGISTRO.' })
   async getEverYear(@Param('user_id') user_id: string): Promise<PartialRegister[]> {

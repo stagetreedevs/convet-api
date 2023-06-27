@@ -15,6 +15,9 @@ export class Register {
   @Column()
   school_subject_name: string;
 
+  @Column({ default: null })
+  school_subject_code: string;
+
   @Column()
   type_school_subject: string;
 
@@ -76,6 +79,7 @@ export class Register {
     user: string,
     type: string,
     school_subject_name: string,
+    school_subject_code: string,
     type_school_subject: string,
     stopwatch: Date,
     start_date: Date,
@@ -95,6 +99,7 @@ export class Register {
     this.user = user;
     this.type = type;
     this.school_subject_name = school_subject_name;
+    this.school_subject_code = school_subject_code;
     this.type_school_subject = type_school_subject;
     this.stopwatch = stopwatch;
     this.start_date = start_date;
