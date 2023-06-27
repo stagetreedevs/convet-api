@@ -48,16 +48,49 @@ export class RegisterService {
     });
   }
 
-  async averageTime(user_id: string, materia: string): Promise<any[]> {
-    const verify: any = await this.regRepository.find({
+  async totalTime(user_id: string, materia: string): Promise<string> {
+    const questions: any[] = await this.regRepository.find({
       where: {
         user: user_id,
         school_subject_name: materia
       },
     });
 
-    console.log(verify);
-    if (verify.qtd_questions == '0') {
+    const allZeroQuestions = questions.every(question => question.qtd_questions === '0');
+
+    if (allZeroQuestions) {
+      return '00:00:00';
+    }
+
+
+    const verify = await this.regRepository.createQueryBuilder("register")
+      .select("SUM(EXTRACT(EPOCH FROM register.duration))", "total_duration")
+      .where("register.user = :user_id", { user_id })
+      .andWhere("register.school_subject_name = :materia", { materia })
+      .getRawOne();
+
+    const totalDurationSeconds = verify.total_duration;
+    const totalDurationHours = Math.floor(totalDurationSeconds / 3600);
+    const totalDurationMinutes = Math.floor((totalDurationSeconds % 3600) / 60);
+    const totalDurationSecondsRemainder = Math.floor(totalDurationSeconds % 60);
+
+    const totalTimeFormatted = `${totalDurationHours.toString().padStart(2, '0')}:${totalDurationMinutes.toString().padStart(2, '0')}:${totalDurationSecondsRemainder.toString().padStart(2, '0')}`;
+
+    return totalTimeFormatted;
+  }
+
+
+  async averageTime(user_id: string, materia: string): Promise<any[]> {
+    const questions: any = await this.regRepository.find({
+      where: {
+        user: user_id,
+        school_subject_name: materia
+      },
+    });
+
+    const allZeroQuestions = questions.every(question => question.qtd_questions === '0');
+
+    if (allZeroQuestions) {
       return [];
     }
 

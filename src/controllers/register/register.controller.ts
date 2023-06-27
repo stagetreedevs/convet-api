@@ -39,6 +39,15 @@ export class RegisterController {
     return hours;
   }
 
+  @Get('total/:user_id/:materia')
+  @ApiOperation({ summary: 'RETORNA O TEMPO TOTAL GASTO NAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E O NOME DA MATÉRIA.' })
+  async totalTime(
+    @Param('user_id') user_id: string,
+    @Param('materia') materia: string,
+  ): Promise<string> {
+    return this.registerService.totalTime(user_id, materia);
+  }
+
   @Get('times/:user_id/:materia')
   @ApiOperation({ summary: 'RETORNA TEMPO MÉDIO DAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E O NOME DA MATÉRIA.' })
   async getAverageTime(
