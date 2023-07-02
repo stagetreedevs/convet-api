@@ -16,8 +16,10 @@ import { RegisterModule } from './controllers/register/register.module';
 import { QuestionModule } from './controllers/question/question.module';
 import { PlanningModule } from './controllers/planning/planning.module';
 import { PlanningCycleModule } from './controllers/planning_cycle/planning_cycle.module';
+import { CycleModule } from './controllers/cycle/cycle.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { ObservationModule } from './controllers/observation/observation.module';
+import { CycleModelModule } from './controllers/cycleModel/cycleModel.module';
 @Module({
   imports: [
     AdminModule,
@@ -27,6 +29,8 @@ import { ObservationModule } from './controllers/observation/observation.module'
     QuestionModule,
     PlanningModule,
     PlanningCycleModule,
+    CycleModule,
+    CycleModelModule,
     ObservationModule,
     TypeOrmModule.forRoot({
       type: 'postgres',

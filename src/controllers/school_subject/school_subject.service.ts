@@ -19,6 +19,10 @@ export class SchoolSubjectService {
     return this.materiaRepository.find();
   }
 
+  async findSelected(): Promise<{ id: string, name: string }[]> {
+    return this.materiaRepository.find({ select: ['code', 'name'] });
+  }  
+
   async findOne(id: string): Promise<SchoolSubject> {
     return this.materiaRepository.findOne({
         where: {

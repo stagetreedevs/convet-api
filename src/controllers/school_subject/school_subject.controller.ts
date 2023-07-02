@@ -22,6 +22,11 @@ export class SchoolSubjectController {
     return this.matService.findAll();
   }
 
+  @Get('selected')
+  async findSelected(): Promise<any[]> {
+    return this.matService.findSelected();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'BUSCAR MATÉRIA ID', description: 'PASSE O ID CORRETO E RETORNA A MATÉRIA DESEJADA.' })
   async findOne(@Param('id') id: string): Promise<SchoolSubject> {

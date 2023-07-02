@@ -23,6 +23,11 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  @Get('selected')
+  async findSelected(): Promise<any[]> {
+    return this.userService.findSelected();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'BUSCAR USUÁRIO', description: 'PASSE COMO PARAMETRO O ID E RETORNE UM USUÁRIO.' })
   async findOne(@Param('id') id: string): Promise<User> {
