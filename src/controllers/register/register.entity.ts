@@ -9,6 +9,9 @@ export class Register {
   @Column({ default: null })
   user: string;
 
+  @Column({ default: null })
+  cycle: string;
+
   @Column()
   type: string;
 
@@ -78,6 +81,7 @@ export class Register {
   constructor(
     user: string,
     type: string,
+    cycle: string,
     school_subject_name: string,
     school_subject_code: string,
     type_school_subject: string,
@@ -98,6 +102,7 @@ export class Register {
   ) {
     this.user = user;
     this.type = type;
+    this.cycle = cycle;
     this.school_subject_name = school_subject_name;
     this.school_subject_code = school_subject_code;
     this.type_school_subject = type_school_subject;

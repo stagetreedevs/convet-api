@@ -34,8 +34,6 @@ export class RegisterService {
     return this.regRepository.save(register);
   }
 
-
-
   async findAll(): Promise<Register[]> {
     return this.regRepository.find();
   }
@@ -61,7 +59,6 @@ export class RegisterService {
     if (allZeroQuestions) {
       return '00:00:00';
     }
-
 
     const verify = await this.regRepository.createQueryBuilder("register")
       .select("SUM(EXTRACT(EPOCH FROM register.duration))", "total_duration")

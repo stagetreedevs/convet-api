@@ -6,6 +6,9 @@ export class RegisterDto {
 
     @ApiProperty()
     user: string;
+
+    @ApiProperty()
+    cycle: string;
     
     @ApiProperty()
     school_subject_name: string;

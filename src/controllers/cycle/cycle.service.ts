@@ -44,6 +44,14 @@ export class CycleService {
     });
   }
 
+  async findMaterias(user_id: string): Promise<any> {
+    return this.cycleService.findOne({
+      where: {
+        user: user_id,
+      },
+    });
+  }
+
   async update(id: string, cycle: Cycle): Promise<Cycle> {
     await this.cycleService.update(id, cycle);
     return this.cycleService.findOne({
