@@ -46,6 +46,15 @@ export class RegisterService {
     });
   }
 
+  async findMateria(user_id: string, materia: string): Promise<any> {
+    return this.regRepository.findOne({
+      where: {
+        user: user_id,
+        school_subject_name: materia,
+      },
+    });
+  }
+
   async totalTime(user_id: string, materia: string): Promise<string> {
     const questions: any[] = await this.regRepository.find({
       where: {
