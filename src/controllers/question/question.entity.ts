@@ -9,9 +9,15 @@ export class Question {
   @Column({ default: null })
   user: string;
 
+  @Column({ default: null })
+  cycle: string;
+
   @Column()
   school_subject_name: string;
-  
+
+  @Column()
+  school_subject_code: string;
+
   @Column()
   content: string;
 
@@ -24,15 +30,17 @@ export class Question {
   @Column({ default: null })
   mistakes: number;
 
-  @Column({default: null})
+  @Column({ default: null })
   comments: string;
 
   @Column({ type: 'date', default: () => 'now()' })
   created_date: Date;
 
-  constructor(user: string, school_subject_name: string, content: string, quantity: number, hits: number, mistakes: number, comments: string, created_date: Date) {
+  constructor(user: string, cycle: string, school_subject_name: string, school_subject_code: string, content: string, quantity: number, hits: number, mistakes: number, comments: string, created_date: Date) {
     this.user = user;
+    this.cycle = cycle;
     this.school_subject_name = school_subject_name;
+    this.school_subject_code = school_subject_code;
     this.content = content;
     this.quantity = quantity;
     this.hits = hits;

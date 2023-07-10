@@ -5,7 +5,13 @@ export class QuestionDto {
     user: string;
 
     @ApiProperty()
+    cycle: string;
+
+    @ApiProperty()
     school_subject_name: string;
+    
+    @ApiProperty()
+    school_subject_code: string;
     
     @ApiProperty()
     content: string;
