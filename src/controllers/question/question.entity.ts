@@ -15,7 +15,7 @@ export class Question {
   @Column()
   school_subject_name: string;
 
-  @Column()
+  @Column({ default: null })
   school_subject_code: string;
 
   @Column()
