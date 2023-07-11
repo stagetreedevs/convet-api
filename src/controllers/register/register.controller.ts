@@ -32,14 +32,6 @@ export class RegisterController {
     return this.registerService.findUser(id);
   }
 
-  @Get(':user_id/:materia')
-  async findMateria(
-    @Param('user_id') user_id: string,
-    @Param('materia') materia: string,
-  ): Promise<any> {
-    return this.registerService.findMateria(user_id, materia);
-  }
-
   @Get('all/:user_id')
   @ApiOperation({ summary: 'RETORNA TODAS HORAS REGISTRADAS NO SISTEMA', description: 'PASSE O ID DO USUÁRIO E RETORNA O TEMPO DE DURAÇÃO DE ESTUDO PARA CADA TIPO DE REGISTRO.' })
   async getAllHours(@Param('user_id') user_id: string): Promise<PartialRegister[]> {
@@ -97,6 +89,12 @@ export class RegisterController {
   @ApiOperation({ summary: 'BUSCAR REGISTRO ID', description: 'PASSE O ID CORRETO E RETORNA O REGISTRO DESEJADO.' })
   async findOne(@Param('id') id: string): Promise<Register> {
     return this.registerService.findOne(id);
+  }
+
+  @Get(':user_id/:materia')
+  @ApiOperation({ summary: 'BUSCAR MATÉRIAS REGISTRADAS PELO ALUNO', description: 'RETORNA AS MATÉRIAS QUE O ALUNO REGISTROU' })
+  async findMateria(@Param('user_id') user_id: string, @Param('materia') materia: string): Promise<any> {
+    return this.registerService.findMateria(user_id, materia);
   }
 
   @Put(':id')
