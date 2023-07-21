@@ -3,7 +3,7 @@ import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CycleHistoryService } from './cycleHistory.service';
 import { CycleHistoryDto } from './cycleHistory.dto';
-import { CycleHistory } from './CycleHistory.entity';
+import { CycleHistory } from './cycleHistory.entity';
 @ApiTags('Histórico de Ciclos')
 @Controller('history')
 export class CycleHistoryController {
