@@ -21,7 +21,7 @@ export class CycleHistoryService {
   async findOne(id: string): Promise<CycleHistory> {
     return this.historyService.findOne({
       where: {
-        id: id,
+        id: id
       },
     });
   }
