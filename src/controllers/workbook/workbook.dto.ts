@@ -12,6 +12,6 @@ export class WorkbookDto {
     materia: string;
 
     @ApiProperty()
-    pages: string;
+    pages: number;
 
 }

@@ -35,8 +35,8 @@ export class WorkbookController {
   }
 
   @Get('materia/:name')
-  @ApiOperation({ summary: 'BUSCAR APOSTILA POR MATÉRIA', description: 'PASSE O NOME CORRETO DA MATÉRIA E RETORNA A APOSTILA DESEJADA.' })
-  async findMateria(@Param('name') name: string): Promise<Workbook> {
+  @ApiOperation({ summary: 'BUSCAR APOSTILAS POR MATÉRIA', description: 'PASSE O NOME CORRETO DA MATÉRIA E RETORNA AS APOSTILAS DESEJADAS.' })
+  async findMateria(@Param('name') name: string): Promise<Workbook[]> {
     return this.workbookService.findMateria(name);
   }
 

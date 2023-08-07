@@ -34,8 +34,8 @@ export class WorkbookService {
     });
   }
 
-  async findMateria(name: string): Promise<Workbook> {
-    return this.wbRepository.findOne({
+  async findMateria(name: string): Promise<Workbook[]> {
+    return this.wbRepository.find({
       where: {
         materia: name,
       }
