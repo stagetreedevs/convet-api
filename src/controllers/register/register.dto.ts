@@ -20,6 +20,9 @@ export class RegisterDto {
     type_school_subject: string;
     
     @ApiProperty()
+    workbook: string;
+    
+    @ApiProperty()
     stopwatch: Date;
     
     @ApiProperty()

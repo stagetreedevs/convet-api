@@ -21,6 +21,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { ObservationModule } from './controllers/observation/observation.module';
 import { CycleModelModule } from './controllers/cycleModel/cycleModel.module';
 import { CycleHistoryModule } from './controllers/cycleHistory/cycleHistory.module';
+import { WorkbookModule } from './controllers/workbook/workbook.module';
 @Module({
   imports: [
     AdminModule,
@@ -33,6 +34,7 @@ import { CycleHistoryModule } from './controllers/cycleHistory/cycleHistory.modu
     CycleModule,
     CycleModelModule,
     CycleHistoryModule,
+    WorkbookModule,
     ObservationModule,
     TypeOrmModule.forRoot({
       type: 'postgres',

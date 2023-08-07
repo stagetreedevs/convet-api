@@ -20,10 +20,13 @@ export class Register {
 
   @Column({ default: null })
   school_subject_code: string;
-
+  
   @Column()
   type_school_subject: string;
 
+  @Column({ default: null })
+  workbook: string;
+  
   @Column({
     type: 'time',
     default: () => "'00:00:00'",
@@ -85,6 +88,7 @@ export class Register {
     school_subject_name: string,
     school_subject_code: string,
     type_school_subject: string,
+    workbook: string,
     stopwatch: Date,
     start_date: Date,
     start_time: Date,
@@ -106,6 +110,7 @@ export class Register {
     this.school_subject_name = school_subject_name;
     this.school_subject_code = school_subject_code;
     this.type_school_subject = type_school_subject;
+    this.workbook = workbook;
     this.stopwatch = stopwatch;
     this.start_date = start_date;
     this.start_time = start_time;
