@@ -15,9 +15,9 @@ export class WorkbookService {
   ) { }
 
   async create(apostila: Workbook): Promise<Workbook> {
-    const verify = await this.findName(apostila.name)
+    const verify = await this.findMateria(apostila.code)
     if (verify) {
-      throw new Error('Essa apostila já existe!');
+      throw new Error('Já existe apostila com esse code!');
     }
     return this.wbRepository.save(apostila);
   }
@@ -51,6 +51,11 @@ export class WorkbookService {
   }
 
   async update(id: string, apostila: Workbook): Promise<Workbook> {
+    const verify = await this.findMateria(apostila.code)
+    if (verify) {
+      throw new Error('Já existe apostila com esse code!');
+    }
+    
     const currentWb = await this.findOne(id);
 
     //Atualiza registro
