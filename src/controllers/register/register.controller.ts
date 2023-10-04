@@ -4,6 +4,7 @@ import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RegisterService } from './register.service';
 import { RegisterDto } from './register.dto';
 import { Register } from './register.entity';
+import { QuestionRegDto } from './question.dto';
 interface PartialRegister {
   type_school_subject: string;
   duration: string;
@@ -18,6 +19,13 @@ export class RegisterController {
   @ApiBody({ type: RegisterDto })
   async create(@Body() register: Register): Promise<Register> {
     return this.registerService.create(register);
+  }
+
+  @Post('question')
+  @ApiOperation({ summary: 'REGISTRAR QUESTÃO', description: 'PASSE O BODY PREENCHIDO E CRIE UM NOVO REGISTRO.' })
+  @ApiBody({ type: QuestionRegDto })
+  async createQuestion(@Body() question: any): Promise<Register> {
+    return this.registerService.createQuestion(question);
   }
 
   @Get()
@@ -83,6 +91,12 @@ export class RegisterController {
   async getCurrentDay(@Param('user_id') user_id: string): Promise<PartialRegister[]> {
     const hours = await this.registerService.currentDay(user_id);
     return hours;
+  }
+
+  @Get('code/:user_id/:code')
+  @ApiOperation({ summary: 'REGISTRO VIA CÓDIGO', description: 'RETORNA O REGISTRO DO ALUNO REFERENTE AO CÓDIGO PASSADO.' })
+  async findByCode(@Param('user_id') user_id: string, @Param('code') code: string): Promise<any> {
+    return this.registerService.findByCode(user_id, code);
   }
 
   @Get(':id')

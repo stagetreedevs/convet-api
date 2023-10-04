@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { startOfWeek, endOfWeek, startOfDay, endOfDay } from 'date-fns';
 import { Register } from './register.entity';
+import { Cycle } from '../cycle/cycle.entity';
 interface PartialRegister {
   type_school_subject: string;
   duration: string;
@@ -13,6 +14,8 @@ export class RegisterService {
   constructor(
     @InjectRepository(Register)
     private readonly regRepository: Repository<Register>,
+    @InjectRepository(Cycle)
+    private readonly cycleService: Repository<Cycle>,
   ) { }
 
   async create(register: Register): Promise<Register> {
@@ -31,7 +34,32 @@ export class RegisterService {
     const roundedPercentage = percentageRead.toFixed(2);
     register.progress = roundedPercentage.toString(); // Converter para string e atribuir a register.progress
 
+    register.revision_number = 1; // Inicializa o número de revisão
+
     return this.regRepository.save(register);
+  }
+
+  async createQuestion(body: any): Promise<Register> {
+    const question = {
+      user: body.user,
+      cycle: body.cycle,
+      school_subject_name: body.school_subject_name,
+      school_subject_code: body.school_subject_code,
+      qtd_questions: body.qtd_questions,
+      questions_hits: body.questions_hits,
+      notes: body.notes,
+      //outros
+      type: '',
+      type_school_subject: '',
+      progress: '0',
+      pages_read: '0',
+      last_page_read: '0',
+      last_page: '0',
+      revision_number: 1,
+      videos_watched: '0'
+    };
+
+    return this.regRepository.save(question);
   }
 
   async findAll(): Promise<Register[]> {
@@ -53,6 +81,136 @@ export class RegisterService {
         school_subject_name: materia,
       },
     });
+  }
+
+  // FUNÇÃO AUXILIAR PARA RETORNAR HORAS DE UMA MATÉRIA CICLO VIA CÓDIGO
+  async userArray(user_id: string, codeToFilter: string): Promise<any | null> {
+    const cycles = await this.cycleService.find({
+      where: {
+        user: user_id,
+      },
+    });
+
+    // Encontre os ciclos que contêm o código especificado
+    const filteredCycles = cycles.filter((cycle) =>
+      cycle.materias.some((materia: any) => materia.code === codeToFilter)
+    );
+
+    // Use um objeto para armazenar as informações agrupadas por código
+    const groupedByCode = {};
+
+    // Itere sobre os ciclos filtrados e agrupe as informações por código
+    filteredCycles.forEach((cycle: any) => {
+      cycle.materias.forEach((materia) => {
+        const code = materia.code;
+
+        if (groupedByCode[code]) {
+          // Se já existe um objeto com esse código, adicione as horas
+          groupedByCode[code].horas += parseInt(materia.horas, 10);
+        } else {
+          // Se não existe um objeto com esse código, crie um novo
+          groupedByCode[code] = {
+            code: code,
+            name: materia.name,
+            horas: parseInt(materia.horas, 10),
+          };
+        }
+      });
+    });
+
+    // Retorne o objeto com o código especificado, se encontrado
+    const result = groupedByCode[codeToFilter] || null;
+
+    return result;
+  }
+
+  // FUNÇÃO AUXILIAR PARA COMPARAR HORAS(NUMBER) COM DURATION(STRING)
+  compareHoursAndDuration(hours, duration) {
+    const durationParts = duration.split(':');
+
+    const durationHours = parseInt(durationParts[0], 10);
+    const durationMinutes = parseInt(durationParts[1], 10);
+    const durationSeconds = parseInt(durationParts[2], 10);
+
+    const totalDurationHours =
+      durationHours + durationMinutes / 60 + durationSeconds / 3600;
+
+    return hours > totalDurationHours;
+  }
+
+  async findByCode(user_id: string, code: string): Promise<any> {
+    const quantityHours = await this.userArray(user_id, code);
+
+    const registros = await this.regRepository.find({
+      where: {
+        user: user_id,
+        school_subject_code: code,
+      },
+    });
+
+    const soma = {
+      pages_read: 0,
+      last_page: 0,
+      progress: "0",
+      revision_number: 0,
+      videos_watched: 0,
+      qtd_questions: 0,
+      questions_hits: 0,
+      duration: "00:00:00",
+      quantity_hours_cycle: quantityHours.horas,
+      finished: false
+    };
+
+    for (const registro of registros) {
+      soma.pages_read += parseFloat(registro.pages_read || '0');
+      soma.videos_watched += parseFloat(registro.videos_watched || '0');
+      soma.qtd_questions += parseFloat(registro.qtd_questions || '0');
+      soma.questions_hits += parseFloat(registro.questions_hits || '0');
+
+      // Soma dos durations
+      const registroDuration = registro.duration;
+      const [horas, minutos, segundos] = registroDuration.split(':').map(Number);
+
+      // Converter a duração do registro em segundos e somar ao total
+      const durationSeconds = horas * 3600 + minutos * 60 + segundos;
+      const totalSeconds = this.convertDurationToSeconds(soma.duration) + durationSeconds;
+
+      // Converter o resultado de volta para o formato "HH:mm:ss"
+      const hours = Math.floor(totalSeconds / 3600);
+      const remainingSeconds = totalSeconds % 3600;
+      const minutes = Math.floor(remainingSeconds / 60);
+      const seconds = remainingSeconds % 60;
+
+      soma.duration = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    let indexLastPage = null;
+
+    for (let i = 0; i < registros.length; i++) {
+      const registro = registros[i];
+      if (registro.last_page !== "0") {
+        indexLastPage = i;
+        break; // Para quando encontrar o primeiro registro com last_page diferente de "0"
+      }
+    }
+
+    if (indexLastPage) {
+      const lastPage = parseInt(registros[indexLastPage].last_page);
+      const pagesRead = soma.pages_read;
+      const percentageRead = (pagesRead / lastPage) * 100;
+      const roundedPercentage = percentageRead.toFixed(2);
+
+      soma.last_page = parseInt(registros[indexLastPage].last_page); // PASSA O VALOR DA ÚLTIMA PÁGINA
+      soma.progress = roundedPercentage.toString(); // ATRIBUI O VALOR DO PROGRESSO
+    }
+
+    soma.revision_number = registros.length;
+
+    // COMPARA SE AS HORAS DO CICLO PASSARAM A DURAÇÃO DE ESTUDO
+    if (!this.compareHoursAndDuration(quantityHours.horas, soma.duration)) {
+      soma.finished = true;
+    }
+    return soma;
   }
 
   async totalTime(user_id: string, materia: string): Promise<string> {
@@ -84,7 +242,6 @@ export class RegisterService {
 
     return totalTimeFormatted;
   }
-
 
   async averageTime(user_id: string, materia: string): Promise<any[]> {
     const questions: any = await this.regRepository.find({
@@ -133,7 +290,7 @@ export class RegisterService {
     }
   }
 
-  // CALCULA PARA TODOS OS REGISTROS
+  // BUSCA TODOS OS REGISTROS
   async allHours(user_id: string): Promise<PartialRegister[]> {
     const registers = await this.regRepository.find({
       where: {
@@ -164,7 +321,7 @@ export class RegisterService {
     return result;
   }
 
-  // CALCULA OS REGISTROS APENAS DE 2023
+  // BUSCA OS REGISTROS DO ANO ATUAL
   async everYear(user_id: string): Promise<PartialRegister[]> {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
@@ -201,7 +358,7 @@ export class RegisterService {
     return result;
   }
 
-  // CALCULA OS REGISTROS APENAS NO MÊS ATUAL
+  // BUSCA OS REGISTROS NO MÊS ATUAL
   async currentMonth(user_id: string): Promise<PartialRegister[]> {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
@@ -239,7 +396,7 @@ export class RegisterService {
     return result;
   }
 
-  // CALCULA OS REGISTROS APENAS NA SEMANA ATUAL
+  // BUSCA OS REGISTROS NA SEMANA ATUAL
   async currentWeek(user_id: string): Promise<PartialRegister[]> {
     const currentDate = new Date();
     const startOfWeekDate = startOfWeek(currentDate);
@@ -275,7 +432,7 @@ export class RegisterService {
     return result;
   }
 
-  // CALCULA OS REGISTROS APENAS NO DIA ATUAL
+  // BUSCA OS REGISTROS NO DIA ATUAL
   async currentDay(user_id: string): Promise<PartialRegister[]> {
     const currentDate = new Date();
     const startOfDayDate = startOfDay(currentDate);
@@ -342,11 +499,7 @@ export class RegisterService {
 
   async update(id: string, register: Register): Promise<Register> {
     await this.regRepository.update(id, register);
-    return this.regRepository.findOne({
-      where: {
-        id: id,
-      }
-    });
+    return this.regRepository.findOne({ where: { id: id } });
   }
 
   async remove(id: string): Promise<void> {

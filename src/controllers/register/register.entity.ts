@@ -70,7 +70,7 @@ export class Register {
   last_page: string;
 
   @Column({ default: null })
-  revision_number: string;
+  revision_number: number;
 
   @Column({ default: null })
   videos_watched: string;
@@ -99,7 +99,7 @@ export class Register {
     pages_read: string,
     last_page_read: string,
     last_page: string,
-    revision_number: string,
+    revision_number: number,
     videos_watched: string,
     qtd_questions: string,
     questions_hits: string
