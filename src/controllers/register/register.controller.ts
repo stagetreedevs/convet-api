@@ -99,6 +99,49 @@ export class RegisterController {
     return this.registerService.findByCode(user_id, code);
   }
 
+/*
+    QUESTÕES
+*/
+
+  @Get('question/all/:user_id/:materia')
+  @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES', description: 'PASSE COMO PARÂMETROS ID DO USUÁRIO E O CÓDIGO DA MATÉRIA PARA OBTER OS DADOS.' })
+  async getAll(@Param('user_id') user_id: string, @Param('materia') materia: string): Promise<any[]> {
+    const hours = await this.registerService.allAnswers(user_id, materia);
+    return hours;
+  }
+
+  @Get('question/year/:user_id/:materia')
+  @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES DO ANO ATUAL', description: 'PASSE COMO PARÂMETROS ID DO USUÁRIO E O CÓDIGO DA MATÉRIA PARA OBTER OS DADOS.' })
+  async getYear(@Param('user_id') user_id: string, @Param('materia') materia: string): Promise<any[]> {
+    const hours = await this.registerService.yearAnswers(user_id, materia);
+    return hours;
+  }
+
+  @Get('question/month/:user_id/:materia')
+  @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES DO MÊS ATUAL', description: 'PASSE COMO PARÂMETROS ID DO USUÁRIO E O CÓDIGO DA MATÉRIA PARA OBTER OS DADOS.' })
+  async getMonth(@Param('user_id') user_id: string, @Param('materia') materia: string): Promise<any[]> {
+    const hours = await this.registerService.monthAnswers(user_id, materia);
+    return hours;
+  }
+
+  @Get('question/week/:user_id/:materia')
+  @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES DA SEMANA ATUAL', description: 'PASSE COMO PARÂMETROS ID DO USUÁRIO E O CÓDIGO DA MATÉRIA PARA OBTER OS DADOS.' })
+  async getWeek(@Param('user_id') user_id: string, @Param('materia') materia: string): Promise<any[]> {
+    const hours = await this.registerService.weekAnswers(user_id, materia);
+    return hours;
+  }
+
+  @Get('question/day/:user_id/:materia')
+  @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES DO DIA ATUAL', description: 'PASSE COMO PARÂMETROS ID DO USUÁRIO E O CÓDIGO DA MATÉRIA PARA OBTER OS DADOS.' })
+  async getDay(@Param('user_id') user_id: string, @Param('materia') materia: string): Promise<any[]> {
+    const hours = await this.registerService.dayAnswers(user_id, materia);
+    return hours;
+  }
+
+/*
+  QUESTÕES
+*/
+
   @Get(':id')
   @ApiOperation({ summary: 'BUSCAR REGISTRO ID', description: 'PASSE O ID CORRETO E RETORNA O REGISTRO DESEJADO.' })
   async findOne(@Param('id') id: string): Promise<Register> {

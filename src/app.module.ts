@@ -13,29 +13,25 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth/auth.service';
 import { SchoolSubjectModule } from './controllers/school_subject/school_subject.module';
 import { RegisterModule } from './controllers/register/register.module';
-import { QuestionModule } from './controllers/question/question.module';
-import { PlanningModule } from './controllers/planning/planning.module';
 import { PlanningCycleModule } from './controllers/planning_cycle/planning_cycle.module';
 import { CycleModule } from './controllers/cycle/cycle.module';
 import { SwaggerModule } from '@nestjs/swagger';
-import { ObservationModule } from './controllers/observation/observation.module';
 import { CycleModelModule } from './controllers/cycleModel/cycleModel.module';
 import { CycleHistoryModule } from './controllers/cycleHistory/cycleHistory.module';
 import { WorkbookModule } from './controllers/workbook/workbook.module';
+import { ObservationModule } from './controllers/observation/observation.module';
 @Module({
   imports: [
     AdminModule,
     UserModule,
     SchoolSubjectModule,
+    ObservationModule,
     RegisterModule,
-    QuestionModule,
-    PlanningModule,
     PlanningCycleModule,
     CycleModule,
     CycleModelModule,
     CycleHistoryModule,
     WorkbookModule,
-    ObservationModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: environment.PG_HOST,
