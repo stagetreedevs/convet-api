@@ -3,10 +3,10 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class ObservationDto {
     @ApiProperty()
-    planning: string;
+    cycle: string;
 
     @ApiProperty()
-    teacher: string;
+    user: string;
     
     @ApiProperty()
     title: string;

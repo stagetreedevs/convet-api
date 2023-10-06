@@ -7,10 +7,10 @@ export class Observation {
   id: string;
 
   @Column({ default: null })
-  planning: string;
+  cycle: string;
 
   @Column({ default: null })
-  teacher: string;
+  user: string;
 
   @Column({ default: null })
   title: string;
@@ -19,13 +19,13 @@ export class Observation {
   message: string;
 
   constructor(
-    planning: string,
-    teacher: string,
+    cycle: string,
+    user: string,
     title: string,
     message: string
   ) {
-    this.planning = planning;
-    this.teacher = teacher;
+    this.cycle = cycle;
+    this.user = user;
     this.title = title;
     this.message = message;
     this.id = uuidv4();

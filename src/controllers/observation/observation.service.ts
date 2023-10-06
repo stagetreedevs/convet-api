@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Observation } from './observation.entity';
-// import { forkJoin } from 'rxjs';
 @Injectable()
 export class ObservationService {
   constructor(
@@ -27,10 +26,10 @@ export class ObservationService {
     });
   }
 
-  async findByPlanning(planning_id: string): Promise<Observation[]> {
+  async findByPlanning(cycle_id: string): Promise<Observation[]> {
     return await this.obsRepository.find({
       where: {
-        planning: planning_id,
+        cycle: cycle_id,
       },
     });
   }
@@ -38,11 +37,11 @@ export class ObservationService {
   async findByUser(id: string): Promise<any[]> {
     return await this.obsRepository.find({
       where: {
-        teacher: id,
+        user: id,
       },
     });
   }
-  
+
 
   async update(id: string, obs: Observation): Promise<Observation> {
     await this.obsRepository.update(id, obs);
