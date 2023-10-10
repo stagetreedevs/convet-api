@@ -213,6 +213,36 @@ export class RegisterService {
     return soma;
   }
 
+  async findForQuestion(user_id: string): Promise<any> {
+    const registros = await this.regRepository.find({
+      where: {
+        user: user_id,
+      },
+    });
+
+    const registrosAgrupados = new Map<string, any>();
+
+    for (const registro of registros) {
+      const code = registro.school_subject_code;
+      if (registrosAgrupados.has(code)) {
+        const grupo = registrosAgrupados.get(code);
+        grupo.qtd_questions += parseFloat(registro.qtd_questions || '0');
+        grupo.questions_hits += parseFloat(registro.questions_hits || '0');
+      } else {
+        registrosAgrupados.set(code, {
+          school_subject_code: code,
+          school_subject_name: registro.school_subject_name,
+          qtd_questions: parseFloat(registro.qtd_questions || '0'),
+          questions_hits: parseFloat(registro.questions_hits || '0'),
+        });
+      }
+    }
+
+    const resultados = Array.from(registrosAgrupados.values());
+    return resultados;
+  }
+
+
   async totalTime(user_id: string, materia: string): Promise<string> {
     const questions: any[] = await this.regRepository.find({
       where: {

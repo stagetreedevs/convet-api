@@ -99,9 +99,15 @@ export class RegisterController {
     return this.registerService.findByCode(user_id, code);
   }
 
-/*
-    QUESTÕES
-*/
+  @Get('questions/:user_id')
+  @ApiOperation({ summary: 'QUESTÕES VIA ID DO USUÁRIO', description: 'RETORNA UM RESUMO DE TODAS AS QUESTÕES REGISTRADAS PELO USUÁRIO.' })
+  async findForQuestion(@Param('user_id') user_id: string): Promise<any> {
+    return this.registerService.findForQuestion(user_id);
+  }
+
+  /*
+      QUESTÕES
+  */
 
   @Get('question/all/:user_id/:materia')
   @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES', description: 'PASSE COMO PARÂMETROS ID DO USUÁRIO E O CÓDIGO DA MATÉRIA PARA OBTER OS DADOS.' })
@@ -138,9 +144,9 @@ export class RegisterController {
     return hours;
   }
 
-/*
-  QUESTÕES
-*/
+  /*
+    QUESTÕES
+  */
 
   @Get(':id')
   @ApiOperation({ summary: 'BUSCAR REGISTRO ID', description: 'PASSE O ID CORRETO E RETORNA O REGISTRO DESEJADO.' })
