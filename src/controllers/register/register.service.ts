@@ -50,7 +50,7 @@ export class RegisterService {
       notes: body.notes,
       //outros
       type: '',
-      type_school_subject: '',
+      type_school_subject: 'Questões',
       progress: '0',
       pages_read: '0',
       last_page_read: '0',
@@ -74,11 +74,11 @@ export class RegisterService {
     });
   }
 
-  async findMateria(user_id: string, materia: string): Promise<any> {
+  async findMateria(user_id: string, code: string): Promise<any> {
     return this.regRepository.findOne({
       where: {
         user: user_id,
-        school_subject_name: materia,
+        school_subject_code: code,
       },
     });
   }
@@ -150,7 +150,7 @@ export class RegisterService {
 
     const soma = {
       pages_read: 0,
-      last_page: 0,
+      last_page: -1, // Inicializado com um valor baixo
       progress: "0",
       revision_number: 0,
       videos_watched: 0,
@@ -158,7 +158,7 @@ export class RegisterService {
       questions_hits: 0,
       duration: "00:00:00",
       quantity_hours_cycle: quantityHours.horas,
-      finished: false
+      finished: false,
     };
 
     for (const registro of registros) {
@@ -184,24 +184,21 @@ export class RegisterService {
       soma.duration = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
-    let indexLastPage = null;
-
     for (let i = 0; i < registros.length; i++) {
       const registro = registros[i];
-      if (registro.last_page !== "0") {
-        indexLastPage = i;
-        break; // Para quando encontrar o primeiro registro com last_page diferente de "0"
+      const lastPage = parseInt(registro.last_page || '0');
+      // Verifica se o lastPage encontrado é maior do que o último maior valor
+      if (lastPage > soma.last_page) {
+        soma.last_page = lastPage;
       }
     }
 
-    if (indexLastPage) {
-      const lastPage = parseInt(registros[indexLastPage].last_page);
+    // Calcula o progresso
+    if (soma.last_page > 0) {
       const pagesRead = soma.pages_read;
-      const percentageRead = (pagesRead / lastPage) * 100;
+      const percentageRead = (pagesRead / soma.last_page) * 100;
       const roundedPercentage = percentageRead.toFixed(2);
-
-      soma.last_page = parseInt(registros[indexLastPage].last_page); // PASSA O VALOR DA ÚLTIMA PÁGINA
-      soma.progress = roundedPercentage.toString(); // ATRIBUI O VALOR DO PROGRESSO
+      soma.progress = roundedPercentage.toString();
     }
 
     soma.revision_number = registros.length;
@@ -210,8 +207,10 @@ export class RegisterService {
     if (!this.compareHoursAndDuration(quantityHours.horas, soma.duration)) {
       soma.finished = true;
     }
+
     return soma;
   }
+
 
   async findForQuestion(user_id: string): Promise<any> {
     const registros = await this.regRepository.find({
@@ -242,25 +241,15 @@ export class RegisterService {
     return resultados;
   }
 
+  async totalTime(user_id: string, code: string): Promise<string> {
 
-  async totalTime(user_id: string, materia: string): Promise<string> {
-    const questions: any[] = await this.regRepository.find({
-      where: {
-        user: user_id,
-        school_subject_name: materia
-      },
-    });
-
-    const allZeroQuestions = questions.every(question => question.qtd_questions === '0');
-
-    if (allZeroQuestions) {
-      return '00:00:00';
-    }
+    const question = 'Questões';
 
     const verify = await this.regRepository.createQueryBuilder("register")
       .select("SUM(EXTRACT(EPOCH FROM register.duration))", "total_duration")
       .where("register.user = :user_id", { user_id })
-      .andWhere("register.school_subject_name = :materia", { materia })
+      .andWhere("register.school_subject_code = :code", { code })
+      .andWhere("register.type_school_subject = :question", { question })
       .getRawOne();
 
     const totalDurationSeconds = verify.total_duration;
@@ -273,52 +262,40 @@ export class RegisterService {
     return totalTimeFormatted;
   }
 
-  async averageTime(user_id: string, materia: string): Promise<any[]> {
-    const questions: any = await this.regRepository.find({
-      where: {
-        user: user_id,
-        school_subject_name: materia
-      },
-    });
-
-    const allZeroQuestions = questions.every(question => question.qtd_questions === '0');
-
-    if (allZeroQuestions) {
-      return [];
-    }
-
-    else {
-      const result = await this.regRepository.createQueryBuilder("register")
-        .select("TO_CHAR(DATE_TRUNC('month', register.start_date)::date, 'YYYY-MM')", "month")
-        .addSelect("DATE_PART('year', register.start_date)::integer", "year")
-        .addSelect("AVG(EXTRACT(EPOCH FROM register.duration))", "avg_duration")
-        .where("register.user = :user_id", { user_id })
-        .andWhere("register.school_subject_name = :materia", { materia })
-        .groupBy("month, year")
-        .orderBy("month", "ASC")
-        .getRawMany();
-
-      // Mapear o resultado para um array de objetos
-      const groupedResults: any[] = [];
-      result.forEach(item => {
-        const month = item.month;
-        const year = item.year;
-        const avgDurationSeconds = parseFloat(item.avg_duration);
-        const avgDurationMinutes = avgDurationSeconds / 60;
-        const avgDurationFormatted = avgDurationMinutes.toFixed(2);
-        const durationUnit = avgDurationMinutes >= 60 ? 'horas' : 'minutos';
-
-        groupedResults.push({
-          month: month,
-          year: year,
-          avgDuration: `${avgDurationFormatted} ${durationUnit}`
-        });
+  async averageTime(user_id: string, code: string): Promise<any[]> {
+    const question = 'Questões';
+  
+    const result = await this.regRepository.createQueryBuilder("register")
+      .select("TO_CHAR(DATE_TRUNC('month', register.start_date)::date, 'YYYY-MM')", "month")
+      .addSelect("DATE_PART('year', register.start_date)::integer", "year")
+      .addSelect("AVG(EXTRACT(EPOCH FROM register.duration))", "avg_duration")
+      .where("register.user = :user_id", { user_id })
+      .andWhere("register.school_subject_code = :code", { code })
+      .andWhere("register.type_school_subject = :question", { question })
+      .groupBy("month, year")
+      .orderBy("month", "ASC")
+      .getRawMany();
+  
+    // Mapear o resultado para um array de objetos
+    const groupedResults: any[] = [];
+    result.forEach(item => {
+      const month = item.month;
+      const year = item.year;
+      const avgDurationSeconds = parseFloat(item.avg_duration);
+      const avgDurationHours = avgDurationSeconds / 3600;
+      const avgDurationFormatted = avgDurationHours.toFixed(2);
+      const durationUnit = avgDurationHours >= 1 ? 'horas' : 'minutos';
+  
+      groupedResults.push({
+        month: month,
+        year: year,
+        avgDuration: `${avgDurationFormatted} ${durationUnit}`
       });
-
-      return groupedResults;
-
-    }
+    });
+  
+    return groupedResults;
   }
+  
 
   // BUSCA TODOS OS REGISTROS
   async allHours(user_id: string): Promise<PartialRegister[]> {

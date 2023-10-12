@@ -47,22 +47,22 @@ export class RegisterController {
     return hours;
   }
 
-  @Get('total/:user_id/:materia')
-  @ApiOperation({ summary: 'RETORNA O TEMPO TOTAL GASTO NAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E O NOME DA MATÉRIA.' })
+  @Get('total/:user_id/:code')
+  @ApiOperation({ summary: 'RETORNA O TEMPO TOTAL GASTO NAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E O CÓDIGO DA MATÉRIA.' })
   async totalTime(
     @Param('user_id') user_id: string,
-    @Param('materia') materia: string,
+    @Param('code') code: string,
   ): Promise<string> {
-    return this.registerService.totalTime(user_id, materia);
+    return this.registerService.totalTime(user_id, code);
   }
 
-  @Get('times/:user_id/:materia')
-  @ApiOperation({ summary: 'RETORNA TEMPO MÉDIO DAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E O NOME DA MATÉRIA.' })
+  @Get('times/:user_id/:code')
+  @ApiOperation({ summary: 'RETORNA TEMPO MÉDIO DAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E O CÓDIGO DA MATÉRIA.' })
   async getAverageTime(
     @Param('user_id') user_id: string,
-    @Param('materia') materia: string,
+    @Param('code') code: string,
   ): Promise<any[]> {
-    return this.registerService.averageTime(user_id, materia);
+    return this.registerService.averageTime(user_id, code);
   }
 
   @Get('year/:user_id')
@@ -109,38 +109,38 @@ export class RegisterController {
       QUESTÕES
   */
 
-  @Get('question/all/:user_id/:materia')
+  @Get('question/all/:user_id/:code')
   @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES', description: 'PASSE COMO PARÂMETROS ID DO USUÁRIO E O CÓDIGO DA MATÉRIA PARA OBTER OS DADOS.' })
-  async getAll(@Param('user_id') user_id: string, @Param('materia') materia: string): Promise<any[]> {
-    const hours = await this.registerService.allAnswers(user_id, materia);
+  async getAll(@Param('user_id') user_id: string, @Param('code') code: string): Promise<any[]> {
+    const hours = await this.registerService.allAnswers(user_id, code);
     return hours;
   }
 
-  @Get('question/year/:user_id/:materia')
+  @Get('question/year/:user_id/:code')
   @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES DO ANO ATUAL', description: 'PASSE COMO PARÂMETROS ID DO USUÁRIO E O CÓDIGO DA MATÉRIA PARA OBTER OS DADOS.' })
-  async getYear(@Param('user_id') user_id: string, @Param('materia') materia: string): Promise<any[]> {
-    const hours = await this.registerService.yearAnswers(user_id, materia);
+  async getYear(@Param('user_id') user_id: string, @Param('code') code: string): Promise<any[]> {
+    const hours = await this.registerService.yearAnswers(user_id, code);
     return hours;
   }
 
-  @Get('question/month/:user_id/:materia')
+  @Get('question/month/:user_id/:code')
   @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES DO MÊS ATUAL', description: 'PASSE COMO PARÂMETROS ID DO USUÁRIO E O CÓDIGO DA MATÉRIA PARA OBTER OS DADOS.' })
-  async getMonth(@Param('user_id') user_id: string, @Param('materia') materia: string): Promise<any[]> {
-    const hours = await this.registerService.monthAnswers(user_id, materia);
+  async getMonth(@Param('user_id') user_id: string, @Param('code') code: string): Promise<any[]> {
+    const hours = await this.registerService.monthAnswers(user_id, code);
     return hours;
   }
 
-  @Get('question/week/:user_id/:materia')
+  @Get('question/week/:user_id/:code')
   @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES DA SEMANA ATUAL', description: 'PASSE COMO PARÂMETROS ID DO USUÁRIO E O CÓDIGO DA MATÉRIA PARA OBTER OS DADOS.' })
-  async getWeek(@Param('user_id') user_id: string, @Param('materia') materia: string): Promise<any[]> {
-    const hours = await this.registerService.weekAnswers(user_id, materia);
+  async getWeek(@Param('user_id') user_id: string, @Param('code') code: string): Promise<any[]> {
+    const hours = await this.registerService.weekAnswers(user_id, code);
     return hours;
   }
 
-  @Get('question/day/:user_id/:materia')
+  @Get('question/day/:user_id/:code')
   @ApiOperation({ summary: 'RETORNA DADOS DE TODAS QUESTÕES DO DIA ATUAL', description: 'PASSE COMO PARÂMETROS ID DO USUÁRIO E O CÓDIGO DA MATÉRIA PARA OBTER OS DADOS.' })
-  async getDay(@Param('user_id') user_id: string, @Param('materia') materia: string): Promise<any[]> {
-    const hours = await this.registerService.dayAnswers(user_id, materia);
+  async getDay(@Param('user_id') user_id: string, @Param('code') code: string): Promise<any[]> {
+    const hours = await this.registerService.dayAnswers(user_id, code);
     return hours;
   }
 
@@ -154,10 +154,10 @@ export class RegisterController {
     return this.registerService.findOne(id);
   }
 
-  @Get(':user_id/:materia')
-  @ApiOperation({ summary: 'BUSCAR MATÉRIAS REGISTRADAS PELO ALUNO', description: 'RETORNA AS MATÉRIAS QUE O ALUNO REGISTROU' })
-  async findMateria(@Param('user_id') user_id: string, @Param('materia') materia: string): Promise<any> {
-    return this.registerService.findMateria(user_id, materia);
+  @Get(':user_id/:code')
+  @ApiOperation({ summary: 'REGISTROS MATÉRIAS ALUNO', description: 'PASSE O ID DO USUÁRIO E O CODE PARA RETORNAR TODOS OS REGISTROS' })
+  async findMateria(@Param('user_id') user_id: string, @Param('code') code: string): Promise<any> {
+    return this.registerService.findMateria(user_id, code);
   }
 
   @Put(':id')
