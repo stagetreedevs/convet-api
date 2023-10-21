@@ -12,10 +12,8 @@ interface PartialRegister {
 @Injectable()
 export class RegisterService {
   constructor(
-    @InjectRepository(Register)
-    private readonly regRepository: Repository<Register>,
-    @InjectRepository(Cycle)
-    private readonly cycleService: Repository<Cycle>,
+    @InjectRepository(Register) private readonly regRepository: Repository<Register>,
+    @InjectRepository(Cycle) private readonly cycleService: Repository<Cycle>,
   ) { }
 
   async create(register: Register): Promise<Register> {
@@ -27,6 +25,7 @@ export class RegisterService {
     const seconds = durationSeconds % 60;
     const duration = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     register.duration = duration;
+    register.duration_cycle_card = duration;
 
     const lastPage = parseInt(register.last_page);
     const pagesRead = parseInt(register.pages_read);
@@ -48,6 +47,7 @@ export class RegisterService {
       qtd_questions: body.qtd_questions,
       questions_hits: body.questions_hits,
       notes: body.notes,
+      id_cycle_card: body.id_cycle_card,
       //outros
       type: '',
       type_school_subject: 'Questões',
@@ -56,7 +56,7 @@ export class RegisterService {
       last_page_read: '0',
       last_page: '0',
       revision_number: 1,
-      videos_watched: '0'
+      videos_watched: '0',
     };
 
     return this.regRepository.save(question);
@@ -81,6 +81,76 @@ export class RegisterService {
         school_subject_code: code,
       },
     });
+  }
+
+  // PEGA O CICLO E RETORNA O FINISHED
+  async findCycleWithUserAndSubject(userId: string, subjectId: string): Promise<any> {
+    const cycle = await this.cycleService.findOne({
+      where: {
+        user: userId,
+      }
+    });
+
+    if (!cycle) {
+      return null;
+    }
+
+    const subject: any = cycle.materias.find((materia: any) => materia.id === subjectId);
+
+    let duracao = '00:00:00';
+    let finished = false;
+
+    const registros = await this.regRepository.find({
+      where: {
+        id_cycle_card: subjectId,
+      }
+    });
+
+    if (registros) {
+      for (const registro of registros) {
+        // Soma dos durations
+        const registroDuration = registro.duration_cycle_card;
+        const [horas, minutos, segundos] = registroDuration.split(':').map(Number);
+
+        // Converter a duração do registro em segundos e somar ao total
+        const durationSeconds = horas * 3600 + minutos * 60 + segundos;
+        const totalSeconds = this.convertDurationToSeconds(duracao) + durationSeconds;
+
+        // Converter o resultado de volta para o formato "HH:mm:ss"
+        const hours = Math.floor(totalSeconds / 3600);
+        const remainingSeconds = totalSeconds % 3600;
+        const minutes = Math.floor(remainingSeconds / 60);
+        const seconds = remainingSeconds % 60;
+
+        duracao = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }
+    }
+
+    const quantityHours = parseInt(subject.horas, 10);
+
+    // COMPARA SE AS HORAS DO CICLO PASSARAM A DURAÇÃO DE ESTUDO
+    if (!this.compareHoursAndDuration(quantityHours, duracao)) {
+      finished = true;
+    }
+
+    const result = {
+      id: cycle.id,
+      user: cycle.user,
+      materia: subject,
+      finished: finished
+    };
+
+    return result;
+  }
+
+  // RESETAR TODAS HORAS DO CICLO
+  async restartCycleRegister(userId: string): Promise<void> {
+    await this.regRepository
+      .createQueryBuilder()
+      .update()
+      .set({ duration_cycle_card: '00:00:00' })
+      .where('user = :userId', { userId })
+      .execute();
   }
 
   // FUNÇÃO AUXILIAR PARA RETORNAR HORAS DE UMA MATÉRIA CICLO VIA CÓDIGO
@@ -158,7 +228,6 @@ export class RegisterService {
       questions_hits: 0,
       duration: "00:00:00",
       quantity_hours_cycle: quantityHours.horas,
-      finished: false,
     };
 
     for (const registro of registros) {
@@ -203,14 +272,8 @@ export class RegisterService {
 
     soma.revision_number = registros.length;
 
-    // COMPARA SE AS HORAS DO CICLO PASSARAM A DURAÇÃO DE ESTUDO
-    if (!this.compareHoursAndDuration(quantityHours.horas, soma.duration)) {
-      soma.finished = true;
-    }
-
     return soma;
   }
-
 
   async findForQuestion(user_id: string): Promise<any> {
     const registros = await this.regRepository.find({
@@ -264,7 +327,7 @@ export class RegisterService {
 
   async averageTime(user_id: string, code: string): Promise<any[]> {
     const question = 'Questões';
-  
+
     const result = await this.regRepository.createQueryBuilder("register")
       .select("TO_CHAR(DATE_TRUNC('month', register.start_date)::date, 'YYYY-MM')", "month")
       .addSelect("DATE_PART('year', register.start_date)::integer", "year")
@@ -275,7 +338,7 @@ export class RegisterService {
       .groupBy("month, year")
       .orderBy("month", "ASC")
       .getRawMany();
-  
+
     // Mapear o resultado para um array de objetos
     const groupedResults: any[] = [];
     result.forEach(item => {
@@ -285,17 +348,17 @@ export class RegisterService {
       const avgDurationHours = avgDurationSeconds / 3600;
       const avgDurationFormatted = avgDurationHours.toFixed(2);
       const durationUnit = avgDurationHours >= 1 ? 'horas' : 'minutos';
-  
+
       groupedResults.push({
         month: month,
         year: year,
         avgDuration: `${avgDurationFormatted} ${durationUnit}`
       });
     });
-  
+
     return groupedResults;
   }
-  
+
 
   // BUSCA TODOS OS REGISTROS
   async allHours(user_id: string): Promise<PartialRegister[]> {
@@ -512,6 +575,13 @@ export class RegisterService {
   async remove(id: string): Promise<void> {
     await this.regRepository.delete(id);
   }
+
+  async removeAll(): Promise<void> {
+    await this.regRepository
+      .createQueryBuilder()
+      .delete()
+      .execute();
+  }  
 
   /*
     FILTRO DE QUESTÕES

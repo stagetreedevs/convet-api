@@ -63,4 +63,10 @@ export class RegisterDto {
     
     @ApiProperty()
     questions_hits: number;
+
+    @ApiProperty()
+    duration_cycle_card: string;
+
+    @ApiProperty()
+    id_cycle_card: string;
 }

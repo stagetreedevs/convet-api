@@ -18,7 +18,7 @@ export class ObservationController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'TODAS QUESTÕES', description: 'RETORNA TODAS AS QUESTÕES DO SISTEMA.' })
+  @ApiOperation({ summary: 'TODAS OBSERVAÇÕES', description: 'RETORNA TODAS AS OBSERVAÇÕES DO SISTEMA.' })
   async findAll(): Promise<Observation[]> {
     return this.obsService.findAll();
   }

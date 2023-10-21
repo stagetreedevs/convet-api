@@ -20,13 +20,13 @@ export class Register {
 
   @Column({ default: null })
   school_subject_code: string;
-  
+
   @Column()
   type_school_subject: string;
 
   @Column({ default: null })
   workbook: string;
-  
+
   @Column({
     type: 'time',
     default: () => "'00:00:00'",
@@ -81,6 +81,16 @@ export class Register {
   @Column({ default: null })
   questions_hits: string;
 
+  //FINISHED CARD AUX
+  @Column({
+    type: 'time',
+    default: () => "'00:00:00'",
+  })
+  duration_cycle_card: string;
+
+  @Column({ default: null })
+  id_cycle_card: string;
+
   constructor(
     user: string,
     type: string,
@@ -102,7 +112,10 @@ export class Register {
     revision_number: number,
     videos_watched: string,
     qtd_questions: string,
-    questions_hits: string
+    questions_hits: string,
+    duration_cycle_card: string,
+    id_cycle_card: string
+
   ) {
     this.user = user;
     this.type = type;
@@ -125,6 +138,8 @@ export class Register {
     this.videos_watched = videos_watched;
     this.qtd_questions = qtd_questions;
     this.questions_hits = questions_hits;
+    this.duration_cycle_card = duration_cycle_card;
+    this.id_cycle_card = id_cycle_card;
     this.id = uuidv4();
   }
 }

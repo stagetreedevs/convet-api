@@ -13,7 +13,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth/auth.service';
 import { SchoolSubjectModule } from './controllers/school_subject/school_subject.module';
 import { RegisterModule } from './controllers/register/register.module';
-import { PlanningCycleModule } from './controllers/planning_cycle/planning_cycle.module';
 import { CycleModule } from './controllers/cycle/cycle.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { CycleModelModule } from './controllers/cycleModel/cycleModel.module';
@@ -27,7 +26,6 @@ import { ObservationModule } from './controllers/observation/observation.module'
     SchoolSubjectModule,
     ObservationModule,
     RegisterModule,
-    PlanningCycleModule,
     CycleModule,
     CycleModelModule,
     CycleHistoryModule,

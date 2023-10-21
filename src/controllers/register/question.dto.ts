@@ -21,4 +21,7 @@ export class QuestionRegDto {
     
     @ApiProperty()
     notes: string;
+    
+    @ApiProperty()
+    id_cycle_card: string;
 }

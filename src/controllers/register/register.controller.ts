@@ -40,6 +40,18 @@ export class RegisterController {
     return this.registerService.findUser(id);
   }
 
+  @Get('user/:userId/:subjectId')
+  @ApiOperation({ summary: 'INFORMAÇÃO SE O CARD ESTÁ FINALIZADO' })
+  async findCycleWithUserAndSubject(@Param('userId') userId: string, @Param('subjectId') subjectId: string): Promise<any> {
+    return this.registerService.findCycleWithUserAndSubject(userId, subjectId);
+  }
+
+  @Put('user/:userId/restart')
+  @ApiOperation({ summary: 'REINICIA O CICLO' })
+  async restartCycleRegister(@Param('userId') userId: string): Promise<any> {
+    return this.registerService.restartCycleRegister(userId);
+  }
+
   @Get('all/:user_id')
   @ApiOperation({ summary: 'RETORNA TODAS HORAS REGISTRADAS NO SISTEMA', description: 'PASSE O ID DO USUÁRIO E RETORNA O TEMPO DE DURAÇÃO DE ESTUDO PARA CADA TIPO DE REGISTRO.' })
   async getAllHours(@Param('user_id') user_id: string): Promise<PartialRegister[]> {
@@ -165,6 +177,11 @@ export class RegisterController {
   async update(@Param('id') id: string, @Body() register: Register): Promise<Register> {
     return this.registerService.update(id, register);
   }
+
+  // @Delete()
+  // async removeAll(): Promise<void> {
+  //   return this.registerService.removeAll();
+  // }
 
   @Delete(':id')
   @ApiOperation({ summary: 'DELETAR REGISTRO', description: 'PASSE O ID CORRETO E DELETA O REGISTRO DESEJADO.' })
