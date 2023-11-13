@@ -19,6 +19,8 @@ import { CycleModelModule } from './controllers/cycleModel/cycleModel.module';
 import { CycleHistoryModule } from './controllers/cycleHistory/cycleHistory.module';
 import { WorkbookModule } from './controllers/workbook/workbook.module';
 import { ObservationModule } from './controllers/observation/observation.module';
+import { ExamModule } from './controllers/exam/exam.module';
+import { ExamHistoryModule } from './controllers/examHistory/examHistory.module';
 @Module({
   imports: [
     AdminModule,
@@ -30,6 +32,8 @@ import { ObservationModule } from './controllers/observation/observation.module'
     CycleModelModule,
     CycleHistoryModule,
     WorkbookModule,
+    ExamModule,
+    ExamHistoryModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: environment.PG_HOST,

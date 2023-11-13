@@ -12,14 +12,12 @@ export class SchoolSubjectService {
   ) { }
 
   async create(materia: SchoolSubject): Promise<SchoolSubject> {
-    const createdMateria = await this.materiaRepository.save(materia);
-
-    const codigo = await this.materiaRepository.findOne({ where: { code: createdMateria.code } });
+    const codigo = await this.materiaRepository.findOne({ where: { code: materia.code } });
     if (codigo) {
       throw new HttpException('Este código já foi utilizado', HttpStatus.BAD_REQUEST);
     }
 
-    return createdMateria;
+    return await this.materiaRepository.save(materia);
   }
 
   async findAll(): Promise<SchoolSubject[]> {
