@@ -9,8 +9,7 @@ import { CycleService } from '../cycle/cycle.service';
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
     private cycle: CycleService
   ) { }
 

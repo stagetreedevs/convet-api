@@ -16,12 +16,18 @@ export class ExamHistoryController {
     return this.examHistService.create(materia);
   }
 
+  @Get('user')
+  @ApiOperation({ summary: 'TODAS QUESTÕES REGISTRADAS COM OS DADOS DO USUÁRIO' })
+  async findAllWithUserdata(): Promise<any[]> {
+    return this.examHistService.findAllWithUserdata();
+  }
+  
   @Get()
   @ApiOperation({ summary: 'TODAS QUESTÕES REGISTRADAS' })
   async findAll(): Promise<ExamHistory[]> {
     return this.examHistService.findAll();
   }
-
+  
   @Get(':id')
   @ApiOperation({ summary: 'BUSCAR QUESTÕES REGISTRADAS PARA UM SIMULADO VIA ID' })
   async findOne(@Param('id') id: string): Promise<ExamHistory> {

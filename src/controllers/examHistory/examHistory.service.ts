@@ -3,10 +3,12 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ExamHistory } from './examHistory.entity';
+import { UserService } from '../user/user.service';
 @Injectable()
 export class ExamHistoryService {
   constructor(
     @InjectRepository(ExamHistory) private readonly examHisRepository: Repository<ExamHistory>,
+    private userService: UserService
   ) { }
 
   async create(simulado: ExamHistory): Promise<ExamHistory> {
@@ -30,6 +32,25 @@ export class ExamHistoryService {
   async findAll(): Promise<ExamHistory[]> {
     return this.examHisRepository.find();
   }
+
+  async findAllWithUserdata(): Promise<any[]> {
+    const exams: any[] = await this.examHisRepository.find({
+      order: {
+        created_at: 'DESC',
+      },
+    });
+
+    if (exams.length > 0) {
+      for (const exam of exams) {
+        const getUser = await this.userService.findOne(exam.user_id);
+        exam.user = getUser;
+        delete exam.user_id;
+      }
+    }
+
+    return exams;
+  }
+
 
   async findOne(id: string): Promise<ExamHistory> {
     return this.examHisRepository.findOne({
