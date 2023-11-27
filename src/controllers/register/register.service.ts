@@ -17,6 +17,7 @@ export class RegisterService {
   ) { }
 
   async create(register: Register): Promise<Register> {
+    // Calcula o tempo de duracao
     const startSeconds = this.convertDurationToSeconds(register.start_time);
     const endSeconds = this.convertDurationToSeconds(register.end_time);
     const durationSeconds = endSeconds - startSeconds;
@@ -27,13 +28,17 @@ export class RegisterService {
     register.duration = duration;
     register.duration_cycle_card = duration;
 
+    // Calcula a porcentagem da leitura
     const lastPage = parseInt(register.last_page);
     const pagesRead = parseInt(register.pages_read);
-    const percentageRead = (pagesRead / lastPage) * 100;
-    const roundedPercentage = percentageRead.toFixed(2);
-    register.progress = roundedPercentage.toString(); // Converter para string e atribuir a register.progress
-
-    register.revision_number = 1; // Inicializa o número de revisão
+    // Verificar se lastPage e pagesRead são números válidos
+    if (!isNaN(lastPage) && !isNaN(pagesRead) && lastPage !== 0) {
+      const percentageRead = (pagesRead / lastPage) * 100;
+      const roundedPercentage = !isNaN(percentageRead) ? percentageRead.toFixed(2) : 0;
+      register.progress = roundedPercentage.toString();
+    } else {
+      throw new Error("Erro: lastPage ou pagesRead não são números válidos.");
+    }
 
     return this.regRepository.save(register);
   }
@@ -55,7 +60,7 @@ export class RegisterService {
       pages_read: '0',
       last_page_read: '0',
       last_page: '0',
-      revision_number: 1,
+      revision_number: 0,
       videos_watched: '0',
     };
 
@@ -256,21 +261,25 @@ export class RegisterService {
     for (let i = 0; i < registros.length; i++) {
       const registro = registros[i];
       const lastPage = parseInt(registro.last_page || '0');
-      // Verifica se o lastPage encontrado é maior do que o último maior valor
       if (lastPage > soma.last_page) {
         soma.last_page = lastPage;
       }
     }
 
-    // Calcula o progresso
+    for (let i = 0; i < registros.length; i++) {
+      const registro = registros[i];
+      const numberRevision = (registro.revision_number || 0);
+      if (numberRevision > soma.revision_number) {
+        soma.revision_number = numberRevision;
+      }
+    }
+
     if (soma.last_page > 0) {
       const pagesRead = soma.pages_read;
       const percentageRead = (pagesRead / soma.last_page) * 100;
       const roundedPercentage = percentageRead.toFixed(2);
       soma.progress = roundedPercentage.toString();
     }
-
-    soma.revision_number = registros.length;
 
     return soma;
   }
@@ -279,6 +288,7 @@ export class RegisterService {
     const registros = await this.regRepository.find({
       where: {
         user: user_id,
+        type_school_subject: 'Questões'
       },
     });
 
@@ -358,7 +368,6 @@ export class RegisterService {
 
     return groupedResults;
   }
-
 
   // BUSCA TODOS OS REGISTROS
   async allHours(user_id: string): Promise<PartialRegister[]> {
@@ -581,7 +590,7 @@ export class RegisterService {
       .createQueryBuilder()
       .delete()
       .execute();
-  }  
+  }
 
   /*
     FILTRO DE QUESTÕES
