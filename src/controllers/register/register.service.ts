@@ -32,12 +32,14 @@ export class RegisterService {
     const lastPage = parseInt(register.last_page);
     const pagesRead = parseInt(register.pages_read);
     // Verificar se lastPage e pagesRead são números válidos
-    if (!isNaN(lastPage) && !isNaN(pagesRead) && lastPage !== 0) {
-      const percentageRead = (pagesRead / lastPage) * 100;
-      const roundedPercentage = !isNaN(percentageRead) ? percentageRead.toFixed(2) : 0;
-      register.progress = roundedPercentage.toString();
-    } else {
-      throw new Error("Erro: lastPage ou pagesRead não são números válidos.");
+    if (lastPage !== 0) {
+      if (!isNaN(lastPage) && !isNaN(pagesRead)) {
+        const percentageRead = (pagesRead / lastPage) * 100;
+        const roundedPercentage = !isNaN(percentageRead) ? percentageRead.toFixed(2) : 0;
+        register.progress = roundedPercentage.toString();
+      } else {
+        throw new Error("Erro: lastPage ou pagesRead não são números válidos.");
+      }
     }
 
     return this.regRepository.save(register);
