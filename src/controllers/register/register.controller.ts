@@ -117,6 +117,12 @@ export class RegisterController {
     return this.registerService.findForQuestion(user_id);
   }
 
+  @Get('questions/:user_id/sum')
+  @ApiOperation({ summary: 'SOMA DE TODAS AS QUESTÕES DO USUÁRIO', description: 'RETORNA A SOMA DE TODAS AS QUESTÕES REGISTRADAS PELO USUÁRIO.' })
+  async numberOfQuestions(@Param('user_id') user_id: string): Promise<any> {
+    return this.registerService.numberOfQuestions(user_id);
+  }
+
   /*
       QUESTÕES
   */

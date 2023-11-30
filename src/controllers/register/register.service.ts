@@ -316,6 +316,36 @@ export class RegisterService {
     return resultados;
   }
 
+  async numberOfQuestions(user_id: string): Promise<any> {
+    const registros = await this.regRepository.find({
+      where: {
+        user: user_id,
+        type_school_subject: 'Questões'
+      },
+    });
+  
+    // Inicializa as variáveis de soma
+    let totalQtdQuestions = 0;
+    let totalQuestionsHits = 0;
+  
+    for (const registro of registros) {
+      // Soma as quantidades para cada registro
+      totalQtdQuestions += parseFloat(registro.qtd_questions || '0');
+      totalQuestionsHits += parseFloat(registro.questions_hits || '0');
+    }
+  
+    // Cria o objeto agregado
+    const resultadoAgregado = {
+      school_subject_code: '',
+      school_subject_name: 'Todas as matérias',
+      qtd_questions: totalQtdQuestions,
+      questions_hits: totalQuestionsHits,
+    };
+  
+    return resultadoAgregado;
+  }
+  
+
   async totalTime(user_id: string, code: string): Promise<string> {
 
     const question = 'Questões';
