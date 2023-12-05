@@ -816,6 +816,36 @@ export class RegisterService {
     FILTRO DE QUESTÕES POR TODAS QUESTÕES
   */
 
+  async questionsPerSystem(user_id: string): Promise<any> {
+    const questions = await this.regRepository.find({
+      where: {
+        user: user_id,
+        type_school_subject: 'Questões',
+      },
+      select: ['qtd_questions', 'questions_hits'],
+    });
+
+    let total = 0;
+    let totalHits = 0;
+
+    questions.forEach((register) => {
+      total += parseInt(register.qtd_questions, 10) || 0;
+      totalHits += parseInt(register.questions_hits, 10) || 0;
+    });
+
+    const hitPercentage = ((totalHits / total) * 100).toFixed(2);
+    const totalMistakes = total - totalHits;
+    const mistakePercentage = ((totalMistakes / total) * 100).toFixed(2);
+
+    return {
+      totalHits,
+      totalMistakes,
+      total,
+      hitPercentage,
+      mistakePercentage,
+    };
+  }
+
   async questionsPerYear(user_id: string): Promise<any> {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();

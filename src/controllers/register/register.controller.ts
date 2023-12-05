@@ -164,6 +164,13 @@ export class RegisterController {
 
   //NO CODE
 
+  @Get('questions/all/:user_id')
+  @ApiOperation({ summary: 'RETORNA A SOMA DE TODAS QUESTÕES NO ANO ATUAL' })
+  async questionsPerSystem(@Param('user_id') user_id: string): Promise<any[]> {
+    const hours = await this.registerService.questionsPerSystem(user_id);
+    return hours;
+  }
+
   @Get('questions/year/:user_id')
   @ApiOperation({ summary: 'RETORNA A SOMA DE TODAS QUESTÕES NO ANO ATUAL' })
   async questionsPerYear(@Param('user_id') user_id: string): Promise<any[]> {
