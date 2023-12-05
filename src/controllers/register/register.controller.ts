@@ -162,6 +162,36 @@ export class RegisterController {
     return hours;
   }
 
+  //NO CODE
+
+  @Get('questions/year/:user_id')
+  @ApiOperation({ summary: 'RETORNA A SOMA DE TODAS QUESTÕES NO ANO ATUAL' })
+  async questionsPerYear(@Param('user_id') user_id: string): Promise<any[]> {
+    const hours = await this.registerService.questionsPerYear(user_id);
+    return hours;
+  }
+
+  @Get('questions/month/:user_id')
+  @ApiOperation({ summary: 'RETORNA A SOMA DE TODAS QUESTÕES DO MÊS ATUAL' })
+  async questionsPerMonth(@Param('user_id') user_id: string): Promise<any[]> {
+    const hours = await this.registerService.questionsPerMonth(user_id);
+    return hours;
+  }
+
+  @Get('questions/week/:user_id')
+  @ApiOperation({ summary: 'RETORNA A SOMA DE TODAS QUESTÕES DA SEMANA ATUAL' })
+  async questionsPerWeek(@Param('user_id') user_id: string): Promise<any[]> {
+    const hours = await this.registerService.questionsPerWeek(user_id);
+    return hours;
+  }
+
+  @Get('questions/day/:user_id')
+  @ApiOperation({ summary: 'RETORNA A SOMA DE TODAS QUESTÕES DO DIA ATUAL' })
+  async questionsPerDay(@Param('user_id') user_id: string): Promise<any[]> {
+    const hours = await this.registerService.questionsPerDay(user_id);
+    return hours;
+  }
+
   /*
     QUESTÕES
   */

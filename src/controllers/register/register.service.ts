@@ -323,17 +323,17 @@ export class RegisterService {
         type_school_subject: 'Questões'
       },
     });
-  
+
     // Inicializa as variáveis de soma
     let totalQtdQuestions = 0;
     let totalQuestionsHits = 0;
-  
+
     for (const registro of registros) {
       // Soma as quantidades para cada registro
       totalQtdQuestions += parseFloat(registro.qtd_questions || '0');
       totalQuestionsHits += parseFloat(registro.questions_hits || '0');
     }
-  
+
     // Cria o objeto agregado
     const resultadoAgregado = {
       school_subject_code: '',
@@ -341,10 +341,10 @@ export class RegisterService {
       qtd_questions: totalQtdQuestions,
       questions_hits: totalQuestionsHits,
     };
-  
+
     return resultadoAgregado;
   }
-  
+
 
   async totalTime(user_id: string, code: string): Promise<string> {
 
@@ -625,13 +625,14 @@ export class RegisterService {
   }
 
   /*
-    FILTRO DE QUESTÕES
+    FILTRO DE QUESTÕES POR CÍDIGO
   */
 
   async allAnswers(user_id: string, materia: string): Promise<any> {
     const questions = await this.regRepository.find({
       where: {
         user: user_id,
+        type_school_subject: 'Questões',
         school_subject_code: materia
       },
       select: ['qtd_questions', 'questions_hits'],
@@ -666,6 +667,7 @@ export class RegisterService {
     const questions = await this.regRepository.find({
       where: {
         user: user_id,
+        type_school_subject: 'Questões',
         school_subject_code: materia,
         start_date: Raw(alias => `${alias} >= '${currentYear}-01-01'`),
       },
@@ -705,6 +707,7 @@ export class RegisterService {
       where: {
         user: user_id,
         school_subject_code: materia,
+        type_school_subject: 'Questões',
         start_date: Between(startOfMonth, endOfMonth),
       },
       select: ['qtd_questions', 'questions_hits'],
@@ -742,6 +745,7 @@ export class RegisterService {
       where: {
         user: user_id,
         school_subject_code: materia,
+        type_school_subject: 'Questões',
         start_date: Between(startOfWeekDate, endOfWeekDate),
       },
       select: ['qtd_questions', 'questions_hits'],
@@ -779,6 +783,7 @@ export class RegisterService {
       where: {
         user: user_id,
         school_subject_code: materia,
+        type_school_subject: 'Questões',
         start_date: Between(startOfDayDate, endOfDayDate),
       },
       select: ['qtd_questions', 'questions_hits'],
@@ -789,6 +794,154 @@ export class RegisterService {
 
     questions.forEach((register) => {
       // Converte as strings para números e adiciona aos totais
+      total += parseInt(register.qtd_questions, 10) || 0;
+      totalHits += parseInt(register.questions_hits, 10) || 0;
+    });
+
+    const hitPercentage = ((totalHits / total) * 100).toFixed(2);
+    const totalMistakes = total - totalHits;
+    const mistakePercentage = ((totalMistakes / total) * 100).toFixed(2);
+
+
+    return {
+      totalHits,
+      totalMistakes,
+      total,
+      hitPercentage,
+      mistakePercentage,
+    };
+  }
+
+  /*
+    FILTRO DE QUESTÕES POR TODAS QUESTÕES
+  */
+
+  async questionsPerYear(user_id: string): Promise<any> {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+
+    const questions = await this.regRepository.find({
+      where: {
+        user: user_id,
+        type_school_subject: 'Questões',
+        start_date: Raw(alias => `${alias} >= '${currentYear}-01-01'`),
+      },
+      select: ['qtd_questions', 'questions_hits'],
+    });
+
+    let total = 0;
+    let totalHits = 0;
+
+    questions.forEach((register) => {
+      total += parseInt(register.qtd_questions, 10) || 0;
+      totalHits += parseInt(register.questions_hits, 10) || 0;
+    });
+
+    const hitPercentage = ((totalHits / total) * 100).toFixed(2);
+    const totalMistakes = total - totalHits;
+    const mistakePercentage = ((totalMistakes / total) * 100).toFixed(2);
+
+    return {
+      totalHits,
+      totalMistakes,
+      total,
+      hitPercentage,
+      mistakePercentage,
+    };
+  }
+
+  async questionsPerMonth(user_id: string): Promise<any> {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1; // Os meses são indexados a partir de 0, então adicionamos 1 para obter o mês atual
+    const startOfMonth = new Date(currentYear, currentMonth - 1, 1);
+    const endOfMonth = new Date(currentYear, currentMonth, 0, 23, 59, 59);
+
+    const questions = await this.regRepository.find({
+      where: {
+        user: user_id,
+        type_school_subject: 'Questões',
+        start_date: Between(startOfMonth, endOfMonth),
+      },
+      select: ['qtd_questions', 'questions_hits'],
+    });
+
+    let total = 0;
+    let totalHits = 0;
+
+    questions.forEach((register) => {
+      total += parseInt(register.qtd_questions, 10) || 0;
+      totalHits += parseInt(register.questions_hits, 10) || 0;
+    });
+
+    const hitPercentage = ((totalHits / total) * 100).toFixed(2);
+    const totalMistakes = total - totalHits;
+    const mistakePercentage = ((totalMistakes / total) * 100).toFixed(2);
+
+
+    return {
+      totalHits,
+      totalMistakes,
+      total,
+      hitPercentage,
+      mistakePercentage,
+    };
+  }
+
+  async questionsPerWeek(user_id: string): Promise<any> {
+    const currentDate = new Date();
+    const startOfWeekDate = startOfWeek(currentDate);
+    const endOfWeekDate = endOfWeek(currentDate);
+
+    const questions = await this.regRepository.find({
+      where: {
+        user: user_id,
+        type_school_subject: 'Questões',
+        start_date: Between(startOfWeekDate, endOfWeekDate),
+      },
+      select: ['qtd_questions', 'questions_hits'],
+    });
+
+    let total = 0;
+    let totalHits = 0;
+
+    questions.forEach((register) => {
+      total += parseInt(register.qtd_questions, 10) || 0;
+      totalHits += parseInt(register.questions_hits, 10) || 0;
+    });
+
+    const hitPercentage = ((totalHits / total) * 100).toFixed(2);
+    const totalMistakes = total - totalHits;
+    const mistakePercentage = ((totalMistakes / total) * 100).toFixed(2);
+
+
+    return {
+      totalHits,
+      totalMistakes,
+      total,
+      hitPercentage,
+      mistakePercentage,
+    };
+  }
+
+  async questionsPerDay(user_id: string): Promise<any> {
+    const currentDate = new Date();
+    const startOfDayDate = startOfDay(currentDate);
+    const endOfDayDate = endOfDay(currentDate);
+
+    const questions = await this.regRepository.find({
+      where: {
+        user: user_id,
+        type_school_subject: 'Questões',
+        start_date: Between(startOfDayDate, endOfDayDate),
+      },
+      select: ['qtd_questions', 'questions_hits'],
+    });
+
+    let total = 0;
+    let totalHits = 0;
+
+    questions.forEach((register) => {
       total += parseInt(register.qtd_questions, 10) || 0;
       totalHits += parseInt(register.questions_hits, 10) || 0;
     });
