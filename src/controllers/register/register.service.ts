@@ -345,7 +345,6 @@ export class RegisterService {
     return resultadoAgregado;
   }
 
-
   async totalTime(user_id: string, code: string): Promise<string> {
 
     const question = 'Questões';
@@ -815,6 +814,58 @@ export class RegisterService {
   /*
     FILTRO DE QUESTÕES POR TODAS QUESTÕES
   */
+
+  async questionTotalTime(user_id: string): Promise<string> {
+    const question = 'Questões';
+
+    const verify = await this.regRepository.createQueryBuilder("register")
+      .select("SUM(EXTRACT(EPOCH FROM register.duration))", "total_duration")
+      .where("register.user = :user_id", { user_id })
+      .andWhere("register.type_school_subject = :question", { question })
+      .getRawOne();
+
+    const totalDurationSeconds = verify.total_duration;
+    const totalDurationHours = Math.floor(totalDurationSeconds / 3600);
+    const totalDurationMinutes = Math.floor((totalDurationSeconds % 3600) / 60);
+    const totalDurationSecondsRemainder = Math.floor(totalDurationSeconds % 60);
+
+    const totalTimeFormatted = `${totalDurationHours.toString().padStart(2, '0')}:${totalDurationMinutes.toString().padStart(2, '0')}:${totalDurationSecondsRemainder.toString().padStart(2, '0')}`;
+
+    return totalTimeFormatted;
+  }
+
+  async questionAvarageTime(user_id: string): Promise<any[]> {
+    const question = 'Questões';
+
+    const result = await this.regRepository.createQueryBuilder("register")
+      .select("TO_CHAR(DATE_TRUNC('month', register.start_date)::date, 'YYYY-MM')", "month")
+      .addSelect("DATE_PART('year', register.start_date)::integer", "year")
+      .addSelect("AVG(EXTRACT(EPOCH FROM register.duration))", "avg_duration")
+      .where("register.user = :user_id", { user_id })
+      .andWhere("register.type_school_subject = :question", { question })
+      .groupBy("month, year")
+      .orderBy("month", "ASC")
+      .getRawMany();
+
+    // Mapear o resultado para um array de objetos
+    const groupedResults: any[] = [];
+    result.forEach(item => {
+      const month = item.month;
+      const year = item.year;
+      const avgDurationSeconds = parseFloat(item.avg_duration);
+      const avgDurationHours = avgDurationSeconds / 3600;
+      const avgDurationFormatted = avgDurationHours.toFixed(2);
+      const durationUnit = avgDurationHours >= 1 ? 'horas' : 'minutos';
+
+      groupedResults.push({
+        month: month,
+        year: year,
+        avgDuration: `${avgDurationFormatted} ${durationUnit}`
+      });
+    });
+
+    return groupedResults;
+  }
 
   async questionsPerSystem(user_id: string): Promise<any> {
     const questions = await this.regRepository.find({

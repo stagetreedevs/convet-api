@@ -164,6 +164,22 @@ export class RegisterController {
 
   //NO CODE
 
+  @Get('questions/alltime/:user_id')
+  @ApiOperation({ summary: 'RETORNA O TEMPO TOTAL GASTO EM TODAS AS QUESTÕES' })
+  async questionTotalTime(
+    @Param('user_id') user_id: string,
+  ): Promise<string> {
+    return this.registerService.questionTotalTime(user_id);
+  }
+
+  @Get('questions/averagetime/:user_id')
+  @ApiOperation({ summary: 'RETORNA TEMPO MÉDIO GASTO EM TODAS AS QUESTÕES' })
+  async questionAvarageTime(
+    @Param('user_id') user_id: string,
+  ): Promise<any[]> {
+    return this.registerService.questionAvarageTime(user_id);
+  }
+
   @Get('questions/all/:user_id')
   @ApiOperation({ summary: 'RETORNA A SOMA DE TODAS QUESTÕES NO ANO ATUAL' })
   async questionsPerSystem(@Param('user_id') user_id: string): Promise<any[]> {
