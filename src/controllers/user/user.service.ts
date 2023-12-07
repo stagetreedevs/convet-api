@@ -17,6 +17,7 @@ export class UserService {
     const createdUser = await this.userRepository.save(user);
 
     const body = {
+      "name": `Ciclo inicial ${user.name}`,
       "user": createdUser.id
     }
 

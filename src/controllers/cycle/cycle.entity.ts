@@ -8,15 +8,20 @@ export class Cycle {
   id: string;
 
   @Column({ default: null })
+  name: string;
+
+  @Column({ default: null })
   user: string;
 
   @Column('jsonb', { default: [] })
   materias: object[];
 
   constructor(
+    name: string,
     user: string,
   ) {
     this.id = uuidv4();
+    this.name = name;
     this.user = user;
     this.materias = [];
   }

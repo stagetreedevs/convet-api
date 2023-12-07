@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cycle } from './cycle.entity';
@@ -54,6 +54,17 @@ export class CycleService {
     });
   }
 
+  async updateName(id: string, body: any): Promise<Cycle> {
+    if (!body.name) {
+      throw new BadRequestException('O campo "name" é obrigatório para a atualização.');
+    }
+  
+    await this.cycleService.update(id, { name: body.name });
+    
+    return await this.findOne(id);
+  }
+  
+
   async update(id: string, cycle: Cycle): Promise<Cycle> {
     await this.cycleService.update(id, cycle);
     return this.cycleService.findOne({
@@ -63,13 +74,14 @@ export class CycleService {
     });
   }
 
-  async updateMaterias(id: string, disciplinas: any): Promise<Cycle> {
-    const order = this.separateByCode(disciplinas);
+  async updateMaterias2(id: string, disciplinas: any): Promise<Cycle> {
+    const order = await this.separateByCode(disciplinas);
 
     const ciclo = await this.findOne(id);
-    
-    if(ciclo.materias.length > 0){
+
+    if (ciclo.materias.length > 0) {
       const history = {
+        name: ciclo.name,
         user: ciclo.user,
         materias: ciclo.materias
       }
@@ -78,6 +90,32 @@ export class CycleService {
     }
 
     await this.cycleService.update(id, { materias: order });
+    return this.cycleService.findOne({
+      where: {
+        id: id,
+      }
+    });
+  }
+
+  async updateMaterias(id: string, body: any): Promise<Cycle> {
+    const disciplinas = body.disciplinas;
+    const name = body.name;
+
+    const order = await this.separateByCode(disciplinas);
+
+    const ciclo = await this.findOne(id);
+
+    if (ciclo.materias.length > 0) {
+      const history = {
+        name: ciclo.name,
+        user: ciclo.user,
+        materias: ciclo.materias
+      }
+
+      await this.histService.create(history);
+    }
+
+    await this.cycleService.update(id, { name, materias: order });
     return this.cycleService.findOne({
       where: {
         id: id,

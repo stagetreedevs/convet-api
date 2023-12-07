@@ -6,6 +6,9 @@ export class CycleHistory {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ default: null })
+  name: string;
+
   @Column()
   user: string;
 
@@ -17,9 +20,11 @@ export class CycleHistory {
 
   constructor(
     user: string,
+    name: string,
     replacement: Date,
   ) {
     this.id = uuidv4();
+    this.name = name;
     this.user = user;
     this.replacement = replacement;
     this.materias = [];

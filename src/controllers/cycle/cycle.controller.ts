@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Patch } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CycleService } from './cycle.service';
-import { CycleDto } from './cycle.dto';
+import { CycleDto, CycleNameDto } from './cycle.dto';
 import { Cycle } from './cycle.entity';
 @ApiTags('Ciclo Individual')
 @Controller('ciclo')
@@ -47,6 +47,15 @@ export class CycleController {
     return this.cycleService.findOne(id);
   }
 
+  @Patch(':id')
+  @ApiOperation({
+    summary: 'EDITAR NOME DO CICLO',
+  })
+  @ApiBody({ type: CycleNameDto })
+  async updatePartial(@Param('id') id: string, @Body() body: any): Promise<Cycle> {
+    return this.cycleService.update(id, body);
+  }
+
   @Put(':id')
   @ApiOperation({ summary: 'EDITAR CICLO INDIVIDUAL', description: 'PASSE O ID CORRETO JUNTO DE UM BODY E RETORNA O CICLO INDIVIDUAL ATUALIZADO.' })
   async update(@Param('id') id: string, @Body() cycle: Cycle): Promise<Cycle> {
@@ -56,6 +65,11 @@ export class CycleController {
   @Put('materias/:id')
   async updateMaterias(@Param('id') id: string, @Body() disciplinas: any): Promise<Cycle> {
     return this.cycleService.updateMaterias(id, disciplinas);
+
+  }
+  @Put('materias/:id/2')
+  async updateMaterias2(@Param('id') id: string, @Body() disciplinas: any): Promise<Cycle> {
+    return this.cycleService.updateMaterias2(id, disciplinas);
   }
 
   @Delete(':id')
