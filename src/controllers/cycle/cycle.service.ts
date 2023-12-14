@@ -58,12 +58,12 @@ export class CycleService {
     if (!body.name) {
       throw new BadRequestException('O campo "name" é obrigatório para a atualização.');
     }
-  
+
     await this.cycleService.update(id, { name: body.name });
-    
+
     return await this.findOne(id);
   }
-  
+
 
   async update(id: string, cycle: Cycle): Promise<Cycle> {
     await this.cycleService.update(id, cycle);
@@ -75,7 +75,7 @@ export class CycleService {
   }
 
   async updateMaterias2(id: string, disciplinas: any): Promise<Cycle> {
-    const order = await this.separateByCode(disciplinas);
+    const order = await this.separateByName(disciplinas);
 
     const ciclo = await this.findOne(id);
 
@@ -101,7 +101,7 @@ export class CycleService {
     const disciplinas = body.disciplinas;
     const name = body.name;
 
-    const order = await this.separateByCode(disciplinas);
+    const order = await this.separateByName(disciplinas);
 
     const ciclo = await this.findOne(id);
 
@@ -123,28 +123,30 @@ export class CycleService {
     });
   }
 
-  separateByCode(objArray: any[]): any[] {
+  separateByName(objArray: any[]): any[] {
     const separatedArray: any[] = [];
-    const codeMap: { [code: string]: any[] } = {};
+    const nameMap: { [name: string]: any[] } = {};
+
     for (const obj of objArray) {
-      const code = obj.code;
-      if (!codeMap[code]) {
-        codeMap[code] = [];
+      const name = obj.name;
+      if (!nameMap[name]) {
+        nameMap[name] = [];
       }
-      codeMap[code].push(obj);
+      nameMap[name].push(obj);
     }
 
     while (true) {
       let added = false;
-      for (const code in codeMap) {
-        if (codeMap[code].length > 0) {
+      for (const name in nameMap) {
+        if (nameMap[name].length > 0) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          separatedArray.push(codeMap[code].shift()!);
+          separatedArray.push(nameMap[name].shift()!);
           added = true;
         }
       }
       if (!added) break;
     }
+
     return separatedArray;
   }
 
