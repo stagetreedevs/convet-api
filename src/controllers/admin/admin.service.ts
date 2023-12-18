@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Admin } from './admin.entity';
@@ -12,6 +11,10 @@ export class AdminService {
     ) { }
 
     async create(admin: Admin): Promise<Admin> {
+        const verify = await this.findEmail(admin.email);
+        if (verify) {
+            throw new BadRequestException('Este email já está sendo utilizado.');
+        }
         return this.adminRepos.save(admin);
     }
 
@@ -36,12 +39,18 @@ export class AdminService {
     }
 
     async update(id: string, admin: Admin): Promise<Admin> {
-        await this.adminRepos.update(id, admin);
-        return this.adminRepos.findOne({
-            where: {
-                id: id,
+        const verify = await this.findOne(id);
+
+        if(verify.email !== admin.email){
+            //Verifica se existe já o email
+            const mail = await this.findEmail(admin.email);
+            if (mail) {
+                throw new BadRequestException('Este email já está sendo utilizado.');
             }
-        });
+        }
+        
+        await this.adminRepos.update(id, admin);
+        return await this.findOne(id);
     }
 
     async remove(id: string): Promise<void> {

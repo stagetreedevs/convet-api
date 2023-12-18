@@ -7,13 +7,17 @@ export class Admin {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ default: "" })
+  name: string;
+
   @Column()
   email: string;
 
   @Column()
   password: string;
 
-  constructor(email: string, password: string) {
+  constructor(name: string, email: string, password: string) {
+    this.name = name;
     this.email = email;
     this.password = password;
     this.id = uuidv4();
