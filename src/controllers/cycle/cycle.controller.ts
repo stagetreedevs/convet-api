@@ -29,6 +29,12 @@ export class CycleController {
     return this.cycleService.findUser(id);
   }
 
+  @Get('user/:id/order')
+  @ApiOperation({ summary: 'BUSCAR CICLOS INDIVIDUAL ORIGINAL' })
+  async findOneCycle(@Param('id') id: string): Promise<Cycle[]> {
+    return this.cycleService.findOneCycle(id);
+  }
+
   @Get('materias/:id')
   @ApiOperation({ summary: 'BUSCAR MATERIAS DE UM CICLO', description: 'PASSE O ID DO USUÁRIO E RETORNA O CICLOS INDIVIDUAL DO MESMO.' })
   async findMaterias(@Param('id') id: string): Promise<any> {

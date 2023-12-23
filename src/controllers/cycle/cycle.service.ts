@@ -28,6 +28,41 @@ export class CycleService {
     });
   }
 
+  async findOneCycle(user_id: string): Promise<Cycle[]> {
+    const cycles = await this.cycleService.find({
+      where: {
+        user: user_id,
+      },
+    });
+
+    // Função para agrupar as matérias pelo nome e somar as horas
+    const groupAndSumSubjects = (subjects) => {
+      const subjectMap = new Map();
+
+      subjects.forEach((subject) => {
+        const { id, name, horas } = subject;
+
+        if (!subjectMap.has(name)) {
+          subjectMap.set(name, { id, name, horas });
+        } else {
+          const existingSubject = subjectMap.get(name);
+          existingSubject.horas += horas;
+        }
+      });
+
+      return Array.from(subjectMap.values());
+    };
+
+    // Aplicar a função de agrupamento e soma para cada ciclo
+    const resultCycles = cycles.map((cycle) => ({
+      ...cycle,
+      materias: groupAndSumSubjects(cycle.materias),
+    }));
+
+    return resultCycles;
+  }
+
+
   async userArray(user_id: string): Promise<any[]> {
     const cycles = await this.cycleService.find({
       where: {
