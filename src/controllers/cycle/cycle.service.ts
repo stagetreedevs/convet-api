@@ -40,10 +40,10 @@ export class CycleService {
       const subjectMap = new Map();
 
       subjects.forEach((subject) => {
-        const { id, name, horas } = subject;
+        const { id, code, name, horas } = subject;
 
         if (!subjectMap.has(name)) {
-          subjectMap.set(name, { id, name, horas });
+          subjectMap.set(name, { id, code, name, horas });
         } else {
           const existingSubject = subjectMap.get(name);
           existingSubject.horas += horas;
