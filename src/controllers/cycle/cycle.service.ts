@@ -42,11 +42,14 @@ export class CycleService {
       subjects.forEach((subject) => {
         const { id, code, name, horas } = subject;
 
+        // Converter horas para número, se for uma string
+        const horasNumber = typeof horas === 'string' ? parseFloat(horas) : horas;
+
         if (!subjectMap.has(name)) {
-          subjectMap.set(name, { id, code, name, horas });
+          subjectMap.set(name, { id, code, name, horas: horasNumber });
         } else {
           const existingSubject = subjectMap.get(name);
-          existingSubject.horas += horas;
+          existingSubject.horas += horasNumber;
         }
       });
 
@@ -99,7 +102,6 @@ export class CycleService {
     return await this.findOne(id);
   }
 
-
   async update(id: string, cycle: Cycle): Promise<Cycle> {
     await this.cycleService.update(id, cycle);
     return this.cycleService.findOne({
@@ -110,7 +112,8 @@ export class CycleService {
   }
 
   async updateMaterias2(id: string, disciplinas: any): Promise<Cycle> {
-    const order = await this.separateByName(disciplinas);
+    const order = await this.separateAndDivideHours(disciplinas);
+    disciplinas = await this.separateByName(order);
 
     const ciclo = await this.findOne(id);
 
@@ -124,7 +127,33 @@ export class CycleService {
       await this.histService.create(history);
     }
 
-    await this.cycleService.update(id, { materias: order });
+    await this.cycleService.update(id, { materias: disciplinas });
+    return await this.findOne(id);
+  }
+
+  async updateMaterias(id: string, body: any): Promise<Cycle> {
+    let disciplinas = body.disciplinas;
+    const name = body.name;
+
+    //QUEBRA AS HORAS DAS MATÉRIAS DO CICLO
+    const order = this.separateAndDivideHours(disciplinas);
+    //FUNÇÃO QUE EMBARALHA
+    disciplinas = this.separateByName(order);
+    // const order = await this.separateByName(disciplinas);
+
+    const ciclo = await this.findOne(id);
+
+    if (ciclo.materias.length > 0) {
+      const history = {
+        name: ciclo.name,
+        user: ciclo.user,
+        materias: ciclo.materias
+      }
+
+      await this.histService.create(history);
+    }
+
+    await this.cycleService.update(id, { name, materias: disciplinas });
     return this.cycleService.findOne({
       where: {
         id: id,
@@ -132,30 +161,46 @@ export class CycleService {
     });
   }
 
-  async updateMaterias(id: string, body: any): Promise<Cycle> {
-    const disciplinas = body.disciplinas;
-    const name = body.name;
+  // AUXILIARES EMBARALHAMENTO
+  generateRandomKey(): string {
+    const s4 = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    return (
+      s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
+    );
+  }
 
-    const order = await this.separateByName(disciplinas);
+  separateAndDivideHours(objArray: any[]): any[] {
+    const separatedAndDividedArray: any[] = [];
+    const codeMap: { [code: string]: any[] } = {};
 
-    const ciclo = await this.findOne(id);
+    for (const obj of objArray) {
+      const code = obj.code;
+      const numericPart = code.match(/\d+$/); // Extrai o numeral final do código
+      const key = numericPart ? `${code.replace(numericPart[0], '')}-${numericPart[0]}` : code;
 
-    if (ciclo.materias.length > 0) {
-      const history = {
-        name: ciclo.name,
-        user: ciclo.user,
-        materias: ciclo.materias
+      if (!codeMap[key]) {
+        codeMap[key] = [];
       }
 
-      await this.histService.create(history);
+      let remainingHours = parseFloat(obj.horas || 0); // Converte horas para número
+
+      while (remainingHours > 0) {
+        let newHours;
+        if (remainingHours >= 1) {
+          newHours = remainingHours % 1 === 0.5 ? 0.5 : 1;
+        } else {
+          newHours = remainingHours;
+        }
+        codeMap[key].push({ ...obj, id: this.generateRandomKey(), horas: newHours });
+        remainingHours -= newHours;
+      }
     }
 
-    await this.cycleService.update(id, { name, materias: order });
-    return this.cycleService.findOne({
-      where: {
-        id: id,
-      }
-    });
+    for (const key in codeMap) {
+      separatedAndDividedArray.push(...codeMap[key]);
+    }
+
+    return separatedAndDividedArray;
   }
 
   separateByName(objArray: any[]): any[] {
@@ -184,6 +229,7 @@ export class CycleService {
 
     return separatedArray;
   }
+  // AUXILIARES EMBARALHAMENTO
 
   async remove(id: string): Promise<void> {
     await this.cycleService.delete(id);
