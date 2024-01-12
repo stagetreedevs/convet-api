@@ -1,15 +1,16 @@
 /* eslint-disable prettier/prettier */
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cycle } from './cycle.entity';
 import { CycleHistoryService } from '../cycleHistory/cycleHistory.service';
+import { RegisterService } from '../register/register.service';
 @Injectable()
 export class CycleService {
   constructor(
-    @InjectRepository(Cycle)
-    private readonly cycleService: Repository<Cycle>,
-    private histService: CycleHistoryService
+    @InjectRepository(Cycle) private readonly cycleService: Repository<Cycle>,
+    @Inject(forwardRef(() => CycleHistoryService)) private readonly histService: CycleHistoryService,
+    @Inject(forwardRef(() => RegisterService)) private readonly registerService: RegisterService,
   ) { }
 
   async create(cycle: any): Promise<Cycle> {
@@ -20,8 +21,8 @@ export class CycleService {
     return this.cycleService.find();
   }
 
-  async findUser(user_id: string): Promise<Cycle[]> {
-    return this.cycleService.find({
+  async findUser(user_id: string): Promise<Cycle> {
+    return this.cycleService.findOne({
       where: {
         user: user_id,
       },
@@ -65,6 +66,38 @@ export class CycleService {
     return resultCycles;
   }
 
+  async fullCycle(cycle: any): Promise<any> {
+    // Função para agrupar as matérias pelo nome e somar as horas
+    const groupAndSumSubjects = (subjects) => {
+      const subjectMap = new Map();
+
+      subjects.forEach((subject) => {
+        const { id, code, name, horas } = subject;
+
+        // Converter horas para número, se for uma string
+        const horasNumber = typeof horas === 'string' ? parseFloat(horas) : horas;
+
+        if (!subjectMap.has(name)) {
+          subjectMap.set(name, { id, code, name, horas: horasNumber });
+        } else {
+          const existingSubject = subjectMap.get(name);
+          existingSubject.horas += horasNumber;
+        }
+      });
+
+      return Array.from(subjectMap.values());
+    };
+
+    // Verificar se cycle é um array ou um objeto individual
+    const cycles = Array.isArray(cycle) ? cycle : [cycle];
+
+    // Aplicar a função de agrupamento e soma para cada ciclo
+    const resultCycles = cycles.map((singleCycle) =>
+      groupAndSumSubjects(singleCycle.materias)
+    );
+
+    return resultCycles;
+  }
 
   async userArray(user_id: string): Promise<any[]> {
     const cycles = await this.cycleService.find({
@@ -91,6 +124,36 @@ export class CycleService {
       },
     });
   }
+
+  async findCodeDetails(user_id: string): Promise<any> {
+    const ciclo = await this.findMaterias(user_id);
+    const materials = ciclo.materias;
+
+    // Use Promise.all para realizar chamadas concorrentes
+    const detailsPromises = materials.map(async (material) => {
+      const code = material.code;
+      const details = await this.registerService.findByCode(user_id, code);
+
+      // Retorne um objeto com as informações enriquecidas
+      return {
+        ...material,
+        details: details,
+      };
+    });
+
+    // Aguarde todas as chamadas assíncronas serem concluídas
+    const enrichedMaterials = await Promise.all(detailsPromises);
+
+    const resolve = {
+      id: ciclo.id,
+      name: ciclo.name,
+      user: ciclo.user,
+      materias: enrichedMaterials,
+    };
+
+    return resolve;
+  }
+
 
   async updateName(id: string, body: any): Promise<Cycle> {
     if (!body.name) {
@@ -159,6 +222,24 @@ export class CycleService {
         id: id,
       }
     });
+  }
+
+  async reCycle(userId: string, cycle: any): Promise<any> {
+    // Pega o ciclo atual do usuário
+    const cicloAtual = await this.findUser(userId);
+    const id = cicloAtual.id;
+
+    //Pega dados do ciclo enviado
+    let materias = cycle.materias;
+    const name = cycle.name;
+
+    //QUEBRA AS HORAS DAS MATÉRIAS DO CICLO
+    const order = this.separateAndDivideHours(materias);
+    //FUNÇÃO QUE EMBARALHA
+    materias = this.separateByName(order);
+
+    await this.cycleService.update(id, { name, materias });
+    return await this.findOne(id);
   }
 
   // AUXILIARES EMBARALHAMENTO

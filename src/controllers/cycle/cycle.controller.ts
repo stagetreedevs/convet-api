@@ -25,7 +25,7 @@ export class CycleController {
 
   @Get('user/:id')
   @ApiOperation({ summary: 'BUSCAR CICLOS INDIVIDUAL DE UM USUÁRIO ESPECÍFICO, PASSANDO SEU ID', description: 'PASSE O ID DO USUÁRIO E RETORNA O CICLOS INDIVIDUAL DO MESMO.' })
-  async findUser(@Param('id') id: string): Promise<Cycle[]> {
+  async findUser(@Param('id') id: string): Promise<Cycle> {
     return this.cycleService.findUser(id);
   }
 
@@ -33,6 +33,12 @@ export class CycleController {
   @ApiOperation({ summary: 'BUSCAR CICLOS INDIVIDUAL ORIGINAL' })
   async findOneCycle(@Param('id') id: string): Promise<Cycle[]> {
     return this.cycleService.findOneCycle(id);
+  }
+
+  @Get('cards/:user_id')
+  @ApiOperation({ summary: 'RETORNAR CICLO DE CARDS' })
+  async findCodeDetails(@Param('user_id') user_id: string): Promise<any> {
+    return this.cycleService.findCodeDetails(user_id);
   }
 
   @Get('materias/:id')
@@ -73,9 +79,19 @@ export class CycleController {
     return this.cycleService.updateMaterias(id, disciplinas);
 
   }
+
   @Put('materias/:id/2')
   async updateMaterias2(@Param('id') id: string, @Body() disciplinas: any): Promise<Cycle> {
     return this.cycleService.updateMaterias2(id, disciplinas);
+  }
+
+  @Put('recycle/:userId')
+  @ApiOperation({ summary: 'REUTILIZA UM CICLO HISTÓRICO' })
+  async reCycle(
+    @Param('userId') userId: string,
+    @Body() cycle: any
+  ): Promise<any> {
+    return this.cycleService.reCycle(userId, cycle);
   }
 
   @Delete(':id')
