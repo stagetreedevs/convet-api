@@ -2,7 +2,7 @@
 import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ExamHistoryService } from './examHistory.service';
-import { ExamHistoryDto } from './examHistory.dto';
+import { ExamHistoryDto, HistDto } from './examHistory.dto';
 import { ExamHistory } from './examHistory.entity';
 @ApiTags('Histórico de Simulados')
 @Controller('exams')
@@ -21,13 +21,13 @@ export class ExamHistoryController {
   async findAllWithUserdata(): Promise<any[]> {
     return this.examHistService.findAllWithUserdata();
   }
-  
+
   @Get()
   @ApiOperation({ summary: 'TODAS QUESTÕES REGISTRADAS' })
   async findAll(): Promise<ExamHistory[]> {
     return this.examHistService.findAll();
   }
-  
+
   @Get(':id')
   @ApiOperation({ summary: 'BUSCAR QUESTÕES REGISTRADAS PARA UM SIMULADO VIA ID' })
   async findOne(@Param('id') id: string): Promise<ExamHistory> {
@@ -53,10 +53,20 @@ export class ExamHistoryController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'EDITAR REGISTRO DE QUESTÕES'})
+  @ApiOperation({ summary: 'EDITAR REGISTRO DE QUESTÕES' })
   @ApiBody({ type: ExamHistoryDto })
   async update(@Param('id') id: string, @Body() materia: ExamHistory): Promise<ExamHistory> {
     return this.examHistService.update(id, materia);
+  }
+
+  @Put(':id/hits')
+  @ApiOperation({ summary: 'EDITAR ACERTOS' })
+  @ApiBody({ type: HistDto })
+  async updateSubjectHits(
+    @Param('id') id: string,
+    @Body() body: HistDto
+  ): Promise<ExamHistory> {
+    return this.examHistService.updateSubjectHits(id, body);
   }
 
   @Delete(':id')

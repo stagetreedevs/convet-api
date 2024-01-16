@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ExamHistory } from './examHistory.entity';
@@ -88,6 +88,28 @@ export class ExamHistoryService {
     await this.examHisRepository.update(id, simulado);
     return await this.findOne(id);
   }
+
+  async updateSubjectHits(id: string, body: any): Promise<ExamHistory> {
+    const { code, hits } = body;
+
+    const simulado = await this.findOne(id);
+
+    if (!simulado) {
+      throw new NotFoundException('Histórico do simulado não encontrado');
+    }
+
+    const updatedSubjects = simulado.subjects.map((subject: any) => {
+      if (subject.code === code) {
+        return { ...subject, hits: hits };
+      }
+      return subject;
+    });
+
+    simulado.subjects = updatedSubjects;
+    await this.examHisRepository.update(id, simulado);
+    return await this.findOne(id);
+  }
+
 
   async remove(id: any): Promise<void> {
     await this.examHisRepository.delete(id);

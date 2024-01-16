@@ -16,3 +16,10 @@ export class ExamHistoryDto {
     @ApiProperty()
     subjects: object[];
 }
+export class HistDto {
+    @ApiProperty()
+    code: string;
+
+    @ApiProperty()
+    hits: number;
+}
