@@ -118,11 +118,32 @@ export class CycleService {
   }
 
   async findMaterias(user_id: string): Promise<any> {
-    return this.cycleService.findOne({
+    const result: any = await this.cycleService.findOne({
       where: {
         user: user_id,
       },
     });
+
+    if (!result) {
+      return null;
+    }
+
+    const uniqueMaterias = result.materias.reduce((acc, materia) => {
+      const existingMateria = acc.find((item) => item.code === materia.code && item.name === materia.name);
+
+      if (!existingMateria) {
+        acc.push(materia);
+      }
+
+      return acc;
+    }, []);
+
+    const sortedMaterias = uniqueMaterias.sort((a, b) => a.name.localeCompare(b.name));
+
+    return {
+      ...result,
+      materias: sortedMaterias,
+    };
   }
 
   async findCodeDetails(user_id: string): Promise<any> {
@@ -153,7 +174,6 @@ export class CycleService {
 
     return resolve;
   }
-
 
   async updateName(id: string, body: any): Promise<Cycle> {
     if (!body.name) {
