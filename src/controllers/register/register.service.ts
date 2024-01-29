@@ -316,6 +316,43 @@ export class RegisterService {
     return resultados;
   }
 
+  // Função que deleta todos os registros de questões
+  async deleteAllQuestions(user: string): Promise<void> {
+    const registros = await this.regRepository.find({
+      where: {
+        user,
+        type_school_subject: 'Questões'
+      },
+    });
+
+    if (!registros || registros.length === 0) {
+      throw new Error("Não foram encontrados registros");
+    }
+
+    for (const registro of registros) {
+      await this.regRepository.delete(registro.id);
+    }
+  }
+
+  // Função que deleta todos os registros de questões por código da matéria
+  async deleteForCodeQuestions(user: string, school_subject_code: string): Promise<void> {
+    const registros = await this.regRepository.find({
+      where: {
+        user,
+        school_subject_code,
+        type_school_subject: 'Questões'
+      },
+    });
+
+    if (!registros || registros.length === 0) {
+      throw new Error("Não foram encontrados registros");
+    }
+
+    for (const registro of registros) {
+      await this.regRepository.delete(registro.id);
+    }
+  }
+
   async numberOfQuestions(user_id: string): Promise<any> {
     const registros = await this.regRepository.find({
       where: {

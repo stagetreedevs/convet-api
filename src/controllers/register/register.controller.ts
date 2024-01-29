@@ -242,6 +242,21 @@ export class RegisterController {
   //   return this.registerService.removeAll();
   // }
 
+  @Delete('questions/:user_id')
+  @ApiOperation({ summary: 'DELETAR TODOS LANÇAMENTOS DE QUESTÕES' })
+  async deleteAllQuestions(@Param('user_id') user_id: string): Promise<void> {
+    return this.registerService.deleteAllQuestions(user_id);
+  }
+
+  @Delete('questions/:user_id/:code')
+  @ApiOperation({ summary: 'DELETAR LANÇAMENTOS DE QUESTÕES VIA CÓDIGO DA MATÉRIA' })
+  async deleteForCodeQuestions(
+    @Param('user_id') user_id: string,
+    @Param('code') code: string,
+  ): Promise<void> {
+    return this.registerService.deleteForCodeQuestions(user_id, code);
+  }
+
   @Delete(':id')
   @ApiOperation({ summary: 'DELETAR REGISTRO', description: 'PASSE O ID CORRETO E DELETA O REGISTRO DESEJADO.' })
   async remove(@Param('id') id: string): Promise<void> {
