@@ -337,9 +337,8 @@ export class RegisterService {
       await this.regRepository.update(registro.id, registro);
     }
 
-    last.questions_hits = qtd;
-    last.qtd_questions = hits;
-    console.log(last);
+    last.qtd_questions = qtd;
+    last.questions_hits = hits;
     await this.regRepository.update(last.id, last);
     return await this.findOne(last.id);
   }
