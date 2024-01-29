@@ -286,10 +286,12 @@ export class RegisterService {
     return soma;
   }
 
+  // Função que retorna lançamento de questões
   async findForQuestion(user_id: string): Promise<any> {
     const registros = await this.regRepository.find({
       where: {
         user: user_id,
+        type: "",
         type_school_subject: 'Questões'
       },
     });
@@ -316,11 +318,38 @@ export class RegisterService {
     return resultados;
   }
 
+  // Função que retorna lançamento de questões
+  async updateQuestions(user: string, school_subject_code: string, qtd: string, hits: string): Promise<any> {
+    const registros = await this.regRepository.find({
+      where: {
+        user: user,
+        type: "",
+        school_subject_code,
+        type_school_subject: 'Questões'
+      },
+    });
+
+    const last = registros[registros.length - 1];
+
+    for (const registro of registros) {
+      registro.qtd_questions = '0';
+      registro.questions_hits = '0';
+      await this.regRepository.update(registro.id, registro);
+    }
+
+    last.questions_hits = qtd;
+    last.qtd_questions = hits;
+    console.log(last);
+    await this.regRepository.update(last.id, last);
+    return await this.findOne(last.id);
+  }
+
   // Função que deleta todos os registros de questões
   async deleteAllQuestions(user: string): Promise<void> {
     const registros = await this.regRepository.find({
       where: {
         user,
+        type: "",
         type_school_subject: 'Questões'
       },
     });
@@ -339,6 +368,7 @@ export class RegisterService {
     const registros = await this.regRepository.find({
       where: {
         user,
+        type: "",
         school_subject_code,
         type_school_subject: 'Questões'
       },

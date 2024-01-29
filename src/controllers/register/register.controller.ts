@@ -2,7 +2,7 @@
 import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RegisterService } from './register.service';
-import { RegisterDto } from './register.dto';
+import { RegQuestionDto, RegisterDto } from './register.dto';
 import { Register } from './register.entity';
 import { QuestionRegDto } from './question.dto';
 interface PartialRegister {
@@ -235,6 +235,18 @@ export class RegisterController {
   @ApiOperation({ summary: 'EDITAR REGISTRO', description: 'PASSE O ID CORRETO JUNTO DE UM BODY E RETORNA O REGISTRO ATUALIZADO.' })
   async update(@Param('id') id: string, @Body() register: Register): Promise<Register> {
     return this.registerService.update(id, register);
+  }
+
+  @ApiOperation({ summary: 'EDITAR REGISTRO DE QUESTÕES' })
+  @ApiBody({ type: RegQuestionDto })
+  @Put('questions/:user_id/:code')
+  async updateQuestions(
+    @Param('user_id') user_id: string,
+    @Param('code') code: string,
+    @Body() body: RegQuestionDto
+  ): Promise<any> {
+    const { qtd_questions, questions_hits } = body;
+    return this.registerService.updateQuestions(user_id, code, qtd_questions, questions_hits);
   }
 
   // @Delete()
