@@ -147,32 +147,21 @@ export class CycleService {
   }
 
   async findCodeDetails(user_id: string): Promise<any> {
-    const ciclo = await this.findMaterias(user_id);
+    const ciclo: any = await this.findUser(user_id);
     const materials = ciclo.materias;
 
-    // Use Promise.all para realizar chamadas concorrentes
-    const detailsPromises = materials.map(async (material) => {
+    // Percorre todas as matérias e adicione os registros
+    for (const material of materials) {
       const code = material.code;
       const details = await this.registerService.findByCode(user_id, code);
-
-      // Retorne um objeto com as informações enriquecidas
-      return {
-        ...material,
-        details: details,
-      };
-    });
-
-    // Aguarde todas as chamadas assíncronas serem concluídas
-    const enrichedMaterials = await Promise.all(detailsPromises);
-
-    const resolve = {
+      material.details = details;
+    }
+    return {
       id: ciclo.id,
       name: ciclo.name,
       user: ciclo.user,
-      materias: enrichedMaterials,
+      materias: materials,
     };
-
-    return resolve;
   }
 
   async updateName(id: string, body: any): Promise<Cycle> {
