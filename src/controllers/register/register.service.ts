@@ -382,6 +382,29 @@ export class RegisterService {
     }
   }
 
+  // DASHBOARD MATERIAS
+  async dashboardQuestion(user_id: string): Promise<any> {
+    const registros = await this.regRepository.find({
+      where: {
+        user: user_id,
+        type_school_subject: 'Questões'
+      },
+      select: [
+        'start_date',
+        'school_subject_code',
+        'school_subject_name',
+        'qtd_questions',
+        'questions_hits'
+      ],
+      order: {
+        start_date: 'ASC'
+      }
+    });
+
+    return registros;
+
+  }
+
   async numberOfQuestions(user_id: string): Promise<any> {
     const registros = await this.regRepository.find({
       where: {

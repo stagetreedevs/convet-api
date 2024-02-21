@@ -219,6 +219,12 @@ export class RegisterController {
     QUESTÕES
   */
 
+  @Get('dashboard/questions/:user_id')
+  @ApiOperation({ summary: 'DASHBOARD QUESTÕES POR MATÉRIAS' })
+  async dashboardQuestion(@Param('user_id') user_id: string): Promise<any[]> {
+    return await this.registerService.dashboardQuestion(user_id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'BUSCAR REGISTRO ID', description: 'PASSE O ID CORRETO E RETORNA O REGISTRO DESEJADO.' })
   async findOne(@Param('id') id: string): Promise<Register> {
