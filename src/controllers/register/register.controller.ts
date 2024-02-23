@@ -60,7 +60,7 @@ export class RegisterController {
   }
 
   @Get('total/:user_id/:code')
-  @ApiOperation({ summary: 'RETORNA O TEMPO TOTAL GASTO NAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E O CÓDIGO DA MATÉRIA.' })
+  // @ApiOperation({ summary: 'RETORNA O TEMPO TOTAL GASTO NAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E O CÓDIGO DA MATÉRIA.' })
   async totalTime(
     @Param('user_id') user_id: string,
     @Param('code') code: string,
@@ -69,12 +69,30 @@ export class RegisterController {
   }
 
   @Get('times/:user_id/:code')
-  @ApiOperation({ summary: 'RETORNA TEMPO MÉDIO DAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E O CÓDIGO DA MATÉRIA.' })
+  // @ApiOperation({ summary: 'RETORNA TEMPO MÉDIO DAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E O CÓDIGO DA MATÉRIA.' })
   async getAverageTime(
     @Param('user_id') user_id: string,
     @Param('code') code: string,
   ): Promise<any[]> {
     return this.registerService.averageTime(user_id, code);
+  }
+
+  @Get('times/:user_id/:code/month')
+  // @ApiOperation({ summary: 'RETORNA TEMPO MÉDIO DAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E O CÓDIGO DA MATÉRIA.' })
+  async averageTimeMonth(
+    @Param('user_id') user_id: string,
+    @Param('code') code: string,
+  ): Promise<any[]> {
+    return this.registerService.averageTimeMonth(user_id, code);
+  }
+
+  @Get('times/:user_id/:code/year')
+  // @ApiOperation({ summary: 'RETORNA TEMPO MÉDIO DAS QUESTÕES', description: 'PASSE O ID DO USUÁRIO E O CÓDIGO DA MATÉRIA.' })
+  async averageTimeYear(
+    @Param('user_id') user_id: string,
+    @Param('code') code: string,
+  ): Promise<any[]> {
+    return this.registerService.averageTimeYear(user_id, code);
   }
 
   @Get('year/:user_id')
