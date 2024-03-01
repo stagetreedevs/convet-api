@@ -425,6 +425,7 @@ export class RegisterService {
 
     // Cria o objeto agregado
     const resultadoAgregado = {
+      id: user_id,
       school_subject_code: '',
       school_subject_name: 'Todas as matérias',
       qtd_questions: totalQtdQuestions,
@@ -611,6 +612,29 @@ export class RegisterService {
       };
     });
   }
+
+
+  // GRÁFICOS DE QUESTÕES
+
+  // async totalQuestions(user_id: string): Promise<any[]> {
+  //   const registros = await this.regRepository.find({
+  //     where: {
+  //       user: user_id,
+  //       type_school_subject: "Questões",
+  //     },
+  //     select: [
+  //       'start_date',
+  //       'qtd_questions',
+  //       'questions_hits'
+  //     ],
+  //     order: {
+  //       start_date: 'ASC'
+  //     }
+  //   });
+
+  //   return registros;
+  // }
+
 
   // BUSCA TODOS OS REGISTROS
   async allHours(user_id: string): Promise<PartialRegister[]> {
