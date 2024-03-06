@@ -9,7 +9,7 @@ export class AppService {
   ) {}
 
   getHello(): string {
-    return 'Hello World!';
+    return 'API Convet running';
   }
 
   async getHistory(user_id: string): Promise<any> {

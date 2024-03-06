@@ -30,8 +30,8 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('CONVET API')
     .setDescription('Convet API - Todos os endpoints da aplicação')
-    .setVersion('1.0')
-    .addTag('app')
+    .setVersion('2.0')
+    // .addTag('app')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
