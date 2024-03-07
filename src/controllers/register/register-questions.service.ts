@@ -50,7 +50,7 @@ export class RegisterQuestionsService {
                 sumQuestionsHits += parseInt(registro.questions_hits);
             }
 
-            const percentage = ((sumQuestionsHits / sumQtdQuestions) * 100).toFixed(2) + '%';
+            const percentage = ((sumQuestionsHits / sumQtdQuestions) * 100).toFixed(2);
 
             data.push({
                 year,
@@ -67,7 +67,7 @@ export class RegisterQuestionsService {
             sumQtdQuestionsTotal += parseInt(registro.qtd_questions);
             sumQuestionsHitsTotal += parseInt(registro.questions_hits);
         }
-        const percentageTotal = ((sumQuestionsHitsTotal / sumQtdQuestionsTotal) * 100).toFixed(2) + '%';
+        const percentageTotal = ((sumQuestionsHitsTotal / sumQtdQuestionsTotal) * 100).toFixed(2);
 
         const result = {
             data,
@@ -124,7 +124,7 @@ export class RegisterQuestionsService {
                     sumQuestionsHits += parseInt(registro.questions_hits);
                 }
 
-                const percentage = ((sumQuestionsHits / sumQtdQuestions) * 100).toFixed(2) + '%';
+                const percentage = ((sumQuestionsHits / sumQtdQuestions) * 100).toFixed(2);
 
                 meses.push({
                     month,
@@ -146,7 +146,7 @@ export class RegisterQuestionsService {
             sumQtdQuestionsTotal += parseInt(registro.qtd_questions);
             sumQuestionsHitsTotal += parseInt(registro.questions_hits);
         }
-        const percentageTotal = ((sumQuestionsHitsTotal / sumQtdQuestionsTotal) * 100).toFixed(2) + '%';
+        const percentageTotal = ((sumQuestionsHitsTotal / sumQtdQuestionsTotal) * 100).toFixed(2);
 
         const result = {
             data,
@@ -200,7 +200,7 @@ export class RegisterQuestionsService {
 
         // Calculando a porcentagem para cada registro agrupado
         const registrosComPorcentagem = Object.values(registrosAgrupados).map(registro => {
-            const percentage = ((registro.questions_hits / registro.qtd_questions) * 100).toFixed(2) + '%';
+            const percentage = ((registro.questions_hits / registro.qtd_questions) * 100).toFixed(2);
             return {
                 ...registro,
                 percentage

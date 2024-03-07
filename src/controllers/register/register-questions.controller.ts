@@ -8,12 +8,12 @@ export class RegisterQuestionsController {
 
     constructor(private readonly registerService: RegisterQuestionsService) { }
 
-    // @Get('/:date')
-    // async getWeeksOfYear(
-    //     @Param('date') date: string
-    // ): Promise<any> {
-    //     return this.registerService.getWeeksOfMonth(date);
-    // }
+    @Get('/:date')
+    async getWeeksOfYear(
+        @Param('date') date: string
+    ): Promise<any> {
+        return this.registerService.getWeeksOfMonth(date);
+    }
 
     @Get('total/:user_id/:code')
     @ApiOperation({ summary: 'TOTAL - GRÁFICO QUESTÕES VIA CÓDIGO' })
