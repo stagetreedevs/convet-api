@@ -8,13 +8,6 @@ export class RegisterQuestionsController {
 
     constructor(private readonly registerService: RegisterQuestionsService) { }
 
-    @Get('/:date')
-    async getWeeksOfYear(
-        @Param('date') date: string
-    ): Promise<any> {
-        return this.registerService.getWeeksOfMonth(date);
-    }
-
     @Get('total/:user_id/:code')
     @ApiOperation({ summary: 'TOTAL - GRÁFICO QUESTÕES VIA CÓDIGO' })
     async totalQuesionsByCode(
@@ -33,9 +26,23 @@ export class RegisterQuestionsController {
         return this.registerService.yearQuestionsByCode(user_id, code);
     }
 
-    //Mês
+    @Get('month/:user_id/:code')
+    @ApiOperation({ summary: 'MÊS - GRÁFICO QUESTÕES VIA CÓDIGO' })
+    async monthQuestionsByCode(
+        @Param('user_id') user_id: string,
+        @Param('code') code: string,
+    ): Promise<any> {
+        return this.registerService.monthQuestionsByCode(user_id, code);
+    }
 
-    //Semana
+    @Get('week/:user_id/:code')
+    @ApiOperation({ summary: 'SEMANA - GRÁFICO QUESTÕES VIA CÓDIGO' })
+    async weekQuestionsByCode(
+        @Param('user_id') user_id: string,
+        @Param('code') code: string,
+    ): Promise<any> {
+        return this.registerService.weekQuestionsByCode(user_id, code);
+    }
 
     @Get('day/:user_id/:code')
     @ApiOperation({ summary: 'DIA - GRÁFICO QUESTÕES VIA CÓDIGO' })

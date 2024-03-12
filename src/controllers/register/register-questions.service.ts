@@ -3,8 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Register } from './register.entity';
-import { eachWeekOfInterval, endOfMonth, startOfMonth } from 'date-fns';
-
+import { eachWeekOfInterval, endOfWeek, startOfWeek } from 'date-fns';
 @Injectable()
 export class RegisterQuestionsService {
     constructor(
@@ -158,11 +157,90 @@ export class RegisterQuestionsService {
         return result;
     }
 
-    // async monthQuestionsByCode(user: string, code: string): Promise<any> {
-    // }
+    async monthQuestionsByCode(user: string, code: string): Promise<any> {
+        const registros = await this.regRepository.find({
+            where: {
+                user,
+                school_subject_code: code,
+                type_school_subject: "Questões",
+            },
+            select: [
+                'start_date',
+                'qtd_questions',
+                'questions_hits'
+            ],
+            order: {
+                start_date: 'ASC'
+            }
+        });
 
-    // async weekQuestionsByCode(user: string, code: string): Promise<any> {
-    // }
+        const first_date = registros[0].start_date;
+        const last_date = registros[(registros.length - 1)].start_date;
+
+        const weeks = this.getWeeksInRange(first_date, last_date);
+
+        // Agrupar registros por semana com indicador de semana
+        const groupedRegisters = weeks.map(week => {
+            const weekRegister = registros.filter(registro => {
+                const registroDate = new Date(registro.start_date);
+                const startDate = new Date(week.split(' - ')[0]);
+                const endDate = new Date(week.split(' - ')[1]);
+                return registroDate >= startDate && registroDate <= endDate;
+            });
+            return { week, registers: weekRegister };
+        });
+
+        const registerSumByDay = await this.calculateSumPerWeek(groupedRegisters);
+
+        for (const semana in registerSumByDay) {
+            const registro = registerSumByDay[semana];
+            if (registro.total_qtd_questions !== 0) {
+                const percentage = ((registro.total_questions_hits / registro.total_qtd_questions) * 100).toFixed(2);
+                registro.percentage = parseFloat(percentage);
+            } else {
+                registro.percentage = 0;
+            }
+        }
+        return this.organizeByYearMonth(registerSumByDay);
+    }
+
+    async weekQuestionsByCode(user: string, code: string): Promise<any> {
+        const registros = await this.regRepository.find({
+            where: {
+                user,
+                school_subject_code: code,
+                type_school_subject: "Questões",
+            },
+            select: [
+                'start_date',
+                'qtd_questions',
+                'questions_hits'
+            ],
+            order: {
+                start_date: 'ASC'
+            }
+        });
+
+        const first_date = registros[0].start_date;
+        const last_date = registros[(registros.length - 1)].start_date;
+
+        const weeks = this.getWeeksInRange(first_date, last_date);
+
+        // Agrupar registros por semana com indicador de semana
+        const groupedRegisters = weeks.map(week => {
+            const weekRegister = registros.filter(registro => {
+                const registroDate = new Date(registro.start_date);
+                const startDate = new Date(week.split(' - ')[0]);
+                const endDate = new Date(week.split(' - ')[1]);
+                return registroDate >= startDate && registroDate <= endDate;
+            });
+            return { week, registers: weekRegister };
+        });
+
+        const registerSumByDays = await this.sumWeeksByStartDate(groupedRegisters);
+        return this.calculatePercentagePerWeek(registerSumByDays);
+
+    }
 
     async dayQuestionsByCode(user: string, code: string): Promise<any[]> {
         const registros = await this.regRepository.find({
@@ -210,11 +288,100 @@ export class RegisterQuestionsService {
         return registrosComPorcentagem;
     }
 
-    getWeeksOfMonth(yearAndMonth: string): any {
-        const [year, month] = yearAndMonth.split('-').map(Number);
-        const startDate = startOfMonth(new Date(year, month - 1)); // Note que month - 1 porque os meses são baseados em zero no JavaScript
-        const endDate = endOfMonth(new Date(year, month - 1));
-        return eachWeekOfInterval({ start: startDate, end: endDate });
+    getWeeksInRange(firstDate, lastDate) {
+        const startDate = startOfWeek(new Date(firstDate), { weekStartsOn: 0 }); // Domingo
+        const endDate = endOfWeek(new Date(lastDate), { weekStartsOn: 0 }); // Sábado
+        const weeks = eachWeekOfInterval({ start: startDate, end: endDate }, { weekStartsOn: 0 });
+
+        return weeks.map(weekStartDate => {
+            const weekEndDate = new Date(weekStartDate);
+            weekEndDate.setDate(weekEndDate.getDate() + 6);
+            return `${weekStartDate.toISOString().substring(0, 10)} - ${weekEndDate.toISOString().substring(0, 10)}`;
+        });
+    }
+
+    calculateSumPerWeek(registros: any[]) {
+        const somaPorSemana = {};
+
+        registros.forEach(registro => {
+            const semana = registro.week;
+
+            // Verifica se a semana já está presente no objeto de somaPorSemana
+            if (!somaPorSemana[semana]) {
+                somaPorSemana[semana] = { total_qtd_questions: 0, total_questions_hits: 0 };
+            }
+
+            // Percorre os registros dentro da semana e adiciona as quantidades
+            registro.registers.forEach(registroSemana => {
+                somaPorSemana[semana].total_qtd_questions += parseInt(registroSemana.qtd_questions);
+                somaPorSemana[semana].total_questions_hits += parseInt(registroSemana.questions_hits);
+            });
+        });
+
+        return somaPorSemana;
+    }
+
+    organizeByYearMonth(registros: any) {
+        const registrosOrganizados = {};
+
+        for (const semana in registros) {
+            const registro = registros[semana];
+            const anoMes = semana.split(' - ')[0].substring(0, 7);
+
+            if (!registrosOrganizados[anoMes]) {
+                registrosOrganizados[anoMes] = [];
+            }
+
+            registrosOrganizados[anoMes].push({ week: semana, ...registro });
+        }
+
+        const resultadoFinal = [];
+        for (const mes in registrosOrganizados) {
+            resultadoFinal.push({ month: mes, weeks: registrosOrganizados[mes] });
+        }
+
+        return resultadoFinal;
+    }
+
+    sumWeeksByStartDate(registros: any) {
+        const somaPorSemana: any[] = [];
+
+        registros.forEach(semana => {
+            const registrosSemana = semana.registers;
+            const soma = registrosSemana.reduce((acc, registro) => {
+                if (!acc[registro.start_date]) {
+                    acc[registro.start_date] = { qtd_questions: 0, questions_hits: 0 };
+                }
+                acc[registro.start_date].qtd_questions += parseInt(registro.qtd_questions, 10);
+                acc[registro.start_date].questions_hits += parseInt(registro.questions_hits, 10);
+                return acc;
+            }, {});
+
+            somaPorSemana.push({
+                week: semana.week,
+                registers: soma
+            });
+        });
+
+        return somaPorSemana;
+    }
+
+    calculatePercentagePerWeek(registersArray) {
+        for (let i = 0; i < registersArray.length; i++) {
+            const weekRegisters = registersArray[i].registers;
+            if (Object.keys(weekRegisters).length > 0) {
+                for (const date in weekRegisters) {
+                    const register = weekRegisters[date];
+                    if (register.hasOwnProperty('qtd_questions') && register.hasOwnProperty('questions_hits')) {
+                        const qtd_questions = register.qtd_questions;
+                        const questions_hits = register.questions_hits;
+                        const percentage = ((questions_hits / qtd_questions) * 100).toFixed(2);
+                        register.percentage = parseFloat(percentage);
+                    }
+                }
+            }
+        }
+        return registersArray;
     }
 
 }
