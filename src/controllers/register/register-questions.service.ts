@@ -201,7 +201,22 @@ export class RegisterQuestionsService {
                 registro.percentage = 0;
             }
         }
-        return this.organizeByYearMonth(registerSumByDay);
+
+        const organization_response = this.organizeByYearMonth(registerSumByDay);
+
+        const meses = this.calculateSumByMonth(organization_response);
+
+        for (const mes of meses) {
+            if (mes.sumQtdQuestions !== 0) {
+                const percentage = ((mes.sumQuestionsHits / mes.sumQtdQuestions) * 100).toFixed(2);
+                mes.percentage = parseFloat(percentage);
+            } else {
+                mes.percentage = 0;
+            }
+        }
+
+        return meses;
+
     }
 
     async weekQuestionsByCode(user: string, code: string): Promise<any> {
@@ -238,8 +253,21 @@ export class RegisterQuestionsService {
         });
 
         const registerSumByDays = await this.sumWeeksByStartDate(groupedRegisters);
-        return this.calculatePercentagePerWeek(registerSumByDays);
 
+        const questions_calculate = this.calculatePercentagePerWeek(registerSumByDays);
+
+        const semanas = this.calculateSumByWeeks(questions_calculate);
+
+        for (const semana of semanas) {
+            if (semana.sumQtdQuestions !== 0) {
+                const percentage = ((semana.sumQuestionsHits / semana.sumQtdQuestions) * 100).toFixed(2);
+                semana.percentage = parseFloat(percentage);
+            } else {
+                semana.percentage = 0;
+            }
+        }
+
+        return semanas;
     }
 
     async dayQuestionsByCode(user: string, code: string): Promise<any[]> {
@@ -341,6 +369,49 @@ export class RegisterQuestionsService {
         }
 
         return resultadoFinal;
+    }
+
+    calculateSumByMonth(months: any[]): any[] {
+        const result: any[] = [];
+
+        for (const month of months) {
+            const sumQtdQuestions = month.weeks.reduce((acc: number, week: any) => acc + week.total_qtd_questions, 0);
+            const sumQuestionsHits = month.weeks.reduce((acc: number, week: any) => acc + week.total_questions_hits, 0);
+
+            const updatedWeeks = month.weeks.map((week: any) => {
+                return {
+                    ...week,
+                    total_qtd_questions: week.total_qtd_questions,
+                    total_questions_hits: week.total_questions_hits,
+                };
+            });
+
+            result.push({
+                month: month.month,
+                sumQtdQuestions,
+                sumQuestionsHits,
+                weeks: updatedWeeks,
+            });
+        }
+
+        return result;
+    }
+
+    calculateSumByWeeks(weeks: any[]): any[] {
+        const result: any[] = [];
+
+        for (const item of weeks) {
+            const sumQtdQuestions = Object.values(item.registers).reduce((acc: number, register: any) => acc + register.qtd_questions, 0);
+            const sumQuestionsHits = Object.values(item.registers).reduce((acc: number, register: any) => acc + register.questions_hits, 0);
+
+            result.push({
+                ...item,
+                sumQtdQuestions,
+                sumQuestionsHits,
+            });
+        }
+
+        return result;
     }
 
     sumWeeksByStartDate(registros: any) {
