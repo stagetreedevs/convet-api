@@ -4,11 +4,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { add } from 'date-fns';
 import { Register } from './register.entity';
+import { RegisterQuestionsService } from './register-questions.service';
 
 @Injectable()
 export class RegisterTimesService {
     constructor(
-        @InjectRepository(Register) private readonly regRepository: Repository<Register>
+        @InjectRepository(Register) private readonly regRepository: Repository<Register>,
+        private readonly questionService: RegisterQuestionsService
     ) { }
 
     async totalTime(user_id: string, code: string): Promise<string> {
@@ -62,6 +64,90 @@ export class RegisterTimesService {
         }));
 
         return this.transformData(resultados);
+    }
+
+    async weekTimeByCode(user: string, code: string): Promise<any> {
+        const registros = await this.regRepository.find({
+            where: {
+                user,
+                school_subject_code: code,
+                type_school_subject: "Questões",
+            },
+            select: [
+                'start_date',
+                'duration'
+            ],
+            order: {
+                start_date: 'ASC'
+            }
+        });
+
+        const first_date = registros[0].start_date;
+        const last_date = registros[(registros.length - 1)].start_date;
+
+        const weeks = this.questionService.getWeeksInRange(first_date, last_date);
+
+        // Agrupar registros por semana com indicador de semana
+        const groupedRegisters = weeks.map(week => {
+            const weekRegister = registros.filter(registro => {
+                const registroDate = new Date(registro.start_date);
+                const startDate = new Date(week.split(' - ')[0]);
+                const endDate = new Date(week.split(' - ')[1]);
+                return registroDate >= startDate && registroDate <= endDate;
+            });
+            return { week, registers: weekRegister };
+        });
+
+        const registerInSeconds = this.registerDurationInSeconds(groupedRegisters);
+
+        const registerSumByDays = await this.sumWeeksByStartDate(registerInSeconds);
+
+        const semanas = this.calculateSumByWeeks(registerSumByDays);
+
+        return this.convertDurationsWeekToHms(semanas);
+    }
+
+    async monthTimeByCode(user: string, code: string): Promise<any> {
+        const registros = await this.regRepository.find({
+            where: {
+                user,
+                school_subject_code: code,
+                type_school_subject: "Questões",
+            },
+            select: [
+                'start_date',
+                'duration'
+            ],
+            order: {
+                start_date: 'ASC'
+            }
+        });
+
+        const first_date = registros[0].start_date;
+        const last_date = registros[(registros.length - 1)].start_date;
+
+        const weeks = this.questionService.getWeeksInRange(first_date, last_date);
+
+        // Agrupar registros por semana com indicador de semana
+        const groupedRegisters = weeks.map(week => {
+            const weekRegister = registros.filter(registro => {
+                const registroDate = new Date(registro.start_date);
+                const startDate = new Date(week.split(' - ')[0]);
+                const endDate = new Date(week.split(' - ')[1]);
+                return registroDate >= startDate && registroDate <= endDate;
+            });
+            return { week, registers: weekRegister };
+        });
+
+        const registerInSeconds = this.registerDurationInSeconds(groupedRegisters);
+
+        const registerSumByDay = this.sumDurationsWithSameStartDate(registerInSeconds);
+
+        const organization_response = this.questionService.organizeByYearMonth(registerSumByDay);
+
+        const meses = this.calculateSumByMonth(organization_response);
+
+        return this.convertDurationsToHms(meses);
     }
 
     async yearTimeByCode(user_id: string, code: string): Promise<any[]> {
@@ -183,6 +269,136 @@ export class RegisterTimesService {
                 ...rest,
             };
         });
+    }
+
+    registerDurationInSeconds(data) {
+        data.forEach(registro => {
+            if (registro.registers.length > 0) {
+                for (const regs of registro.registers) {
+                    const durationInSeconds = this.durationToSeconds(regs.duration); // Converter a duração para segundos
+                    regs.duration = durationInSeconds;
+                }
+            }
+        });
+
+        return data;
+    }
+
+    sumDurationsWithSameStartDate(registros: any[]) {
+        const somaPorSemana = {};
+
+        registros.forEach(registro => {
+            const semana = registro.week;
+
+            // Verifica se a semana já está presente no objeto de somaPorSemana
+            if (!somaPorSemana[semana]) {
+                somaPorSemana[semana] = { duration: 0 };
+            }
+
+            // Percorre os registros dentro da semana e adiciona as quantidades
+            registro.registers.forEach(registroSemana => {
+                somaPorSemana[semana].duration += parseInt(registroSemana.duration);
+            });
+        });
+
+        return somaPorSemana;
+    }
+
+    calculateSumByMonth(months: any[]): any[] {
+        const result: any[] = [];
+
+        for (const month of months) {
+            const month_duration = month.weeks.reduce((acc: number, week: any) => acc + week.duration, 0);
+
+            const updatedWeeks = month.weeks.map((week: any) => {
+                return {
+                    ...week
+                };
+            });
+
+            result.push({
+                month: month.month,
+                month_duration,
+                weeks: updatedWeeks,
+            });
+        }
+
+        return result;
+    }
+
+    sumWeeksByStartDate(registros: any) {
+        const somaPorSemana: any[] = [];
+
+        registros.forEach(semana => {
+            const registrosSemana = semana.registers;
+            const soma = registrosSemana.reduce((acc, registro) => {
+                if (!acc[registro.start_date]) {
+                    acc[registro.start_date] = { duration: 0 };
+                }
+                acc[registro.start_date].duration += parseInt(registro.duration, 10);
+                return acc;
+            }, {});
+
+            somaPorSemana.push({
+                week: semana.week,
+                registers: soma
+            });
+        });
+
+        return somaPorSemana;
+    }
+
+    calculateSumByWeeks(weeks: any[]): any[] {
+        const result: any[] = [];
+
+        for (const item of weeks) {
+            const week_duration = Object.values(item.registers).reduce((acc: number, register: any) => acc + register.duration, 0);
+            result.push({
+                ...item,
+                week_duration
+            });
+        }
+
+        return result;
+    }
+
+    secondsToHms(seconds: number): string {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+        return `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(remainingSeconds)}`;
+    }
+
+    pad(num: number): string {
+        return num < 10 ? `0${num}` : num.toString();
+    }
+
+    convertDurationsToHms(data: any[]): any[] {
+        const convertedData = data.map(month => ({
+            month: month.month,
+            month_duration: this.secondsToHms(month.month_duration),
+            weeks: month.weeks.map(week => ({
+                week: week.week,
+                duration: this.secondsToHms(week.duration),
+            })),
+        }));
+
+        return convertedData;
+    }
+
+    convertDurationsWeekToHms(data: any[]): any[] {
+        const convertedData = data.map(week => ({
+            week: week.week,
+            registers: Object.keys(week.registers).reduce((acc, registerDate) => {
+                acc[registerDate] = {
+                    duration: this.secondsToHms(week.registers[registerDate].duration),
+                };
+                return acc;
+            }, {}),
+            week_duration: this.secondsToHms(week.week_duration),
+        }));
+
+        return convertedData;
     }
 
 }

@@ -27,12 +27,30 @@ export class RegisterTimesController {
     }
 
     @Get(':user_id/:code/year')
-    @ApiOperation({ summary: 'MÊS - GRÁFICO TEMPO MÉDIO VIA CÓDIGO' })
+    @ApiOperation({ summary: 'ANO - GRÁFICO TEMPO MÉDIO VIA CÓDIGO' })
     async yearTimeByCode(
         @Param('user_id') user_id: string,
         @Param('code') code: string,
     ): Promise<any[]> {
         return this.registerService.yearTimeByCode(user_id, code);
+    }
+
+    @Get(':user_id/:code/month')
+    @ApiOperation({ summary: 'MÊS - GRÁFICO TEMPO MÉDIO VIA CÓDIGO' })
+    async monthTimeByCode(
+        @Param('user_id') user_id: string,
+        @Param('code') code: string,
+    ): Promise<any[]> {
+        return this.registerService.monthTimeByCode(user_id, code);
+    }
+
+    @Get(':user_id/:code/week')
+    @ApiOperation({ summary: 'SEMANA - GRÁFICO TEMPO MÉDIO VIA CÓDIGO' })
+    async weekTimeByCode(
+        @Param('user_id') user_id: string,
+        @Param('code') code: string,
+    ): Promise<any[]> {
+        return this.registerService.weekTimeByCode(user_id, code);
     }
 
     @Get(':user_id/:code/day')
