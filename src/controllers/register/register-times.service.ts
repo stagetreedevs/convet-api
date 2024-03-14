@@ -104,7 +104,9 @@ export class RegisterTimesService {
 
         const semanas = this.calculateSumByWeeks(registerSumByDays);
 
-        return this.convertDurationsWeekToHms(semanas);
+        const semanas_convertidas = this.convertDurationsWeekToHms(semanas);
+
+        return this.questionService.transformWeekRegisters(semanas_convertidas);
     }
 
     async monthTimeByCode(user: string, code: string): Promise<any> {

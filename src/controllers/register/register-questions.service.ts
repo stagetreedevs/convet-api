@@ -267,7 +267,7 @@ export class RegisterQuestionsService {
             }
         }
 
-        return semanas;
+        return this.transformWeekRegisters(semanas);
     }
 
     async dayQuestionsByCode(user: string, code: string): Promise<any[]> {
@@ -435,6 +435,16 @@ export class RegisterQuestionsService {
         });
 
         return somaPorSemana;
+    }
+
+    transformWeekRegisters(data: any[]): any[] {
+        return data.map(item => ({
+            ...item,
+            registers: Object.keys(item.registers).map(day => ({
+                day,
+                ...item.registers[day]
+            }))
+        }));
     }
 
     calculatePercentagePerWeek(registersArray) {
