@@ -8,22 +8,19 @@ export class RegisterTimesController {
 
     constructor(private readonly registerService: RegisterTimesService) { }
 
-    @Get('total/:user_id/:code')
-    @ApiOperation({ summary: 'TEMPO TOTAL DOS REGISTROS' })
-    async totalTime(
-        @Param('user_id') user_id: string,
-        @Param('code') code: string,
-    ): Promise<string> {
-        return this.registerService.totalTime(user_id, code);
-    }
-
     @Get(':user_id/:code/total')
     @ApiOperation({ summary: 'TOTAL - GRÁFICO TEMPO MÉDIO VIA CÓDIGO' })
     async totalTimeByCode(
         @Param('user_id') user_id: string,
         @Param('code') code: string,
-    ): Promise<any[]> {
-        return this.registerService.totalTimeByCode(user_id, code);
+    ): Promise<any> {
+        const years = await this.registerService.totalTimeByCode(user_id, code);
+        const total = await this.registerService.totalTime(user_id, code);
+
+        return {
+            total_duration: total,
+            years
+        }
     }
 
     @Get(':user_id/:code/year')
