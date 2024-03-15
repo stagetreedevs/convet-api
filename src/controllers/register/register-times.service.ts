@@ -71,7 +71,6 @@ export class RegisterTimesService {
             where: {
                 user,
                 school_subject_code: code,
-                type_school_subject: "Questões",
             },
             select: [
                 'start_date',
@@ -114,7 +113,6 @@ export class RegisterTimesService {
             where: {
                 user,
                 school_subject_code: code,
-                type_school_subject: "Questões",
             },
             select: [
                 'start_date',
