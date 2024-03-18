@@ -21,6 +21,7 @@ import { WorkbookModule } from './controllers/workbook/workbook.module';
 import { ObservationModule } from './controllers/observation/observation.module';
 import { ExamModule } from './controllers/exam/exam.module';
 import { ExamHistoryModule } from './controllers/examHistory/examHistory.module';
+import { EditModelModule } from './controllers/editModel/editModel.module';
 @Module({
   imports: [
     AdminModule,
@@ -34,6 +35,7 @@ import { ExamHistoryModule } from './controllers/examHistory/examHistory.module'
     WorkbookModule,
     ExamModule,
     ExamHistoryModule,
+    EditModelModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: environment.PG_HOST,

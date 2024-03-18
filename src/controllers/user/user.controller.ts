@@ -47,9 +47,12 @@ export class UserController {
   }
 
   @Post('upload/')
-  @ApiOperation({ summary: 'Upload firebase', description: 'PASSE COMO PARAMETRO O EMAIL DO USUÁRIO E A IMAGEM(ARQUIVO FILE), PARA REALIZAR O UPLOAD NO FIREBASE STORAGE.' })
+  @ApiOperation({ summary: 'ATUALIZAR IMAGEM' })
   @UseInterceptors(FileInterceptor('file'))
-  async upload(@Query() username: any, @UploadedFile() file){
-    return this.userService.upload(username, file);
+  async upload(@Query() username: any, @UploadedFile() file) {
+    const url = await this.userService.upload(username, file);
+    const user = await this.userService.findEmail(username);
+    user.photo = url.url;
+    return this.userService.update(user.id, user);
   }
 }
