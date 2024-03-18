@@ -50,9 +50,7 @@ export class UserController {
   @ApiOperation({ summary: 'ATUALIZAR IMAGEM' })
   @UseInterceptors(FileInterceptor('file'))
   async upload(@Query() username: any, @UploadedFile() file) {
-    const url = await this.userService.upload(username, file);
-    const user = await this.userService.findEmail(username);
-    user.photo = url.url;
-    return this.userService.update(user.id, user);
+    const link = await this.userService.upload(username, file);
+    await this.userService.updatePhoto(username, link.url);
   }
 }

@@ -58,6 +58,13 @@ export class UserService {
     });
   }
 
+  async updatePhoto(email: string, photo: string): Promise<void> {
+    await this.userRepository.update(
+      { email },
+      { photo }
+    );
+  }
+
   async remove(id: string): Promise<void> {
     this.cycle.deleteByUser(id);
     await this.userRepository.delete(id);
