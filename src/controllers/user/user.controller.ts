@@ -51,6 +51,7 @@ export class UserController {
   @UseInterceptors(FileInterceptor('file'))
   async upload(@Query() username: any, @UploadedFile() file) {
     const link = await this.userService.upload(username, file);
+    console.log(link.url, username);
     await this.userService.updatePhoto(username, link.url);
   }
 }
