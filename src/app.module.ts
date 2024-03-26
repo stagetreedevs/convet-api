@@ -22,6 +22,7 @@ import { ObservationModule } from './controllers/observation/observation.module'
 import { ExamModule } from './controllers/exam/exam.module';
 import { ExamHistoryModule } from './controllers/examHistory/examHistory.module';
 import { EditModelModule } from './controllers/editModel/editModel.module';
+import { EditCycleModule } from './controllers/editCycle/editCycle.module';
 @Module({
   imports: [
     AdminModule,
@@ -36,6 +37,7 @@ import { EditModelModule } from './controllers/editModel/editModel.module';
     ExamModule,
     ExamHistoryModule,
     EditModelModule,
+    EditCycleModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: environment.PG_HOST,

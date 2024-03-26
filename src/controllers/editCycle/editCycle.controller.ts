@@ -1,12 +1,12 @@
 /* eslint-disable prettier/prettier */
 import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { EditModelService } from './editModel.service';
-@ApiTags('Salvar Edição - Ciclo Modelo')
-@Controller('editModel')
-export class EditModelController {
+import { EditCycleService } from './editCycle.service';
+@ApiTags('Salvar Edição - Ciclo Individual')
+@Controller('editCycle')
+export class EditCycleController {
 
-    constructor(private readonly editModelService: EditModelService) { }
+    constructor(private readonly editModelService: EditCycleService) { }
 
     @Post()
     @ApiOperation({ summary: 'SALVAR EDIÇÃO DO CICLO' })
@@ -26,13 +26,12 @@ export class EditModelController {
         return this.editModelService.findOne(id);
     }
 
-    @Get(':user_id/:model_id')
+    @Get('user/:user_id')
     @ApiOperation({ summary: 'BUSCAR EDIÇÃO VIA USUÁRIO E MODELO' })
-    async findByUserModel(
-        @Param('user_id') user_id: string,
-        @Param('model_id') model_id: string
+    async findByUser(
+        @Param('user_id') user_id: string
     ): Promise<any> {
-        return this.editModelService.findByUserModel(user_id, model_id);
+        return this.editModelService.findByUser(user_id);
     }
 
     @Put(':id')
@@ -47,9 +46,9 @@ export class EditModelController {
         return this.editModelService.updateMaterias(id, materias);
     }
 
-    // @Delete(':id')
-    // async remove(@Param('id') id: string): Promise<void> {
-    //     return this.editModelService.remove(id);
-    // }
+    @Delete(':id')
+    async remove(@Param('id') id: string): Promise<void> {
+        return this.editModelService.remove(id);
+    }
 
 }

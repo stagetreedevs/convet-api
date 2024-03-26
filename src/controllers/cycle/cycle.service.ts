@@ -29,6 +29,25 @@ export class CycleService {
     });
   }
 
+  async findCycleUnionHours(user_id: string): Promise<any> {
+    const ciclo = await this.findUser(user_id);
+
+    const materiasPorCodigo = {};
+
+    ciclo.materias.forEach((materia: any) => {
+      const { code, horas } = materia;
+
+      if (materiasPorCodigo[code]) {
+        materiasPorCodigo[code].horas += horas;
+      } else {
+        materiasPorCodigo[code] = { ...materia };
+      }
+    });
+
+    const materiasComHorasSomadas = Object.values(materiasPorCodigo);
+    return { ...ciclo, materias: materiasComHorasSomadas };
+  }
+
   async findOneCycle(user_id: string): Promise<Cycle[]> {
     const cycles = await this.cycleService.find({
       where: {
@@ -183,11 +202,11 @@ export class CycleService {
     });
   }
 
-  async updateMaterias2(id: string, disciplinas: any): Promise<Cycle> {
+  async updateMaterias2(user_id: string, disciplinas: any): Promise<Cycle> {
     const order = await this.separateAndDivideHours(disciplinas);
     disciplinas = await this.separateByName(order);
 
-    const ciclo = await this.findOne(id);
+    const ciclo = await this.findUser(user_id);
 
     if (ciclo.materias.length > 0) {
       const history = {
@@ -199,8 +218,8 @@ export class CycleService {
       await this.histService.create(history);
     }
 
-    await this.cycleService.update(id, { materias: disciplinas });
-    return await this.findOne(id);
+    await this.cycleService.update(ciclo.id, { materias: disciplinas });
+    return await this.findOne(ciclo.id);
   }
 
   async updateMaterias(id: string, body: any): Promise<Cycle> {

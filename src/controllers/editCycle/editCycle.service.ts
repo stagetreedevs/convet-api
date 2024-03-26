@@ -2,11 +2,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { EditModel } from './editModel.entity';
+import { EditCycle } from './editCycle.entity';
 @Injectable()
-export class EditModelService {
+export class EditCycleService {
     constructor(
-        @InjectRepository(EditModel) private readonly editRepository: Repository<EditModel>,
+        @InjectRepository(EditCycle) private readonly editRepository: Repository<EditCycle>,
     ) { }
 
     async create(model: any): Promise<any> {
@@ -21,8 +21,8 @@ export class EditModelService {
         return this.editRepository.findOne({ where: { id: id } });
     }
 
-    async findByUserModel(user_id: string, model_id: string): Promise<any> {
-        return this.editRepository.findOne({ where: { user_id, model_id } });
+    async findByUser(user_id: string): Promise<any> {
+        return await this.editRepository.findOne({ where: { user_id: user_id } });
     }
 
     async update(id: string, model: any): Promise<any> {

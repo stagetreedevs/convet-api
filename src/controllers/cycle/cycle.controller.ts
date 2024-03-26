@@ -35,6 +35,14 @@ export class CycleController {
     return this.cycleService.findOneCycle(id);
   }
 
+  @Get('user/:id/complete')
+  // @ApiOperation({ summary: 'BUSCAR CICLOS INDIVIDUAL ORIGINAL' })
+  async findCycleUnionHours(
+    @Param('id') id: string
+  ): Promise<any> {
+    return this.cycleService.findCycleUnionHours(id);
+  }
+
   @Get('cards/:user_id')
   @ApiOperation({ summary: 'RETORNAR CICLO DE CARDS' })
   async findCodeDetails(@Param('user_id') user_id: string): Promise<any> {
@@ -80,9 +88,12 @@ export class CycleController {
 
   }
 
-  @Put('materias/:id/2')
-  async updateMaterias2(@Param('id') id: string, @Body() disciplinas: any): Promise<Cycle> {
-    return this.cycleService.updateMaterias2(id, disciplinas);
+  @Put('materias/:user_id/2')
+  async updateMaterias2(
+    @Param('user_id') user_id: string,
+    @Body() disciplinas: any
+  ): Promise<Cycle> {
+    return this.cycleService.updateMaterias2(user_id, disciplinas);
   }
 
   @Put('recycle/:userId')
