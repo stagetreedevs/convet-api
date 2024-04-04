@@ -238,7 +238,11 @@ export class RegisterService {
     };
 
     for (const registro of registros) {
-      soma.pages_read += parseFloat(registro.pages_read || '0');
+      const pagesRead = parseFloat(registro.pages_read || '0');
+      if (pagesRead > soma.pages_read) {
+        soma.pages_read = pagesRead;
+      }
+      // soma.pages_read += parseFloat(registro.pages_read || '0');
       soma.videos_watched += parseFloat(registro.videos_watched || '0');
       soma.qtd_questions += parseFloat(registro.qtd_questions || '0');
       soma.questions_hits += parseFloat(registro.questions_hits || '0');
