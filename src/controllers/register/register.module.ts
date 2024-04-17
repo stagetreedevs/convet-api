@@ -10,6 +10,10 @@ import { RegisterQuestionsController } from './register-questions.controller';
 import { RegisterQuestionsService } from './register-questions.service';
 import { RegisterTimesController } from './register-times.controller';
 import { RegisterTimesService } from './register-times.service';
+import { RegisterAllQuestionsController } from './register-all-questions.controller';
+import { RegisterAllQuestionsService } from './register-all-questions.service';
+import { RegisterAllTimesController } from './register-all-times.constroller';
+import { RegisterAllTimesService } from './register-all-times.service';
 @Module({
     imports: [
         forwardRef(() => CycleModule),
@@ -19,12 +23,16 @@ import { RegisterTimesService } from './register-times.service';
     controllers: [
         RegisterController,
         RegisterQuestionsController,
-        RegisterTimesController
+        RegisterAllQuestionsController,
+        RegisterTimesController,
+        RegisterAllTimesController
     ],
     providers: [
         RegisterService,
         RegisterQuestionsService,
-        RegisterTimesService
+        RegisterAllQuestionsService,
+        RegisterTimesService,
+        RegisterAllTimesService
     ],
     exports: [RegisterService]
 })

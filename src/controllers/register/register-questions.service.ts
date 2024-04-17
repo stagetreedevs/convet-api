@@ -174,6 +174,10 @@ export class RegisterQuestionsService {
             }
         });
 
+        if (registros.length == 0) {
+            return [];
+        }
+
         const first_date = registros[0].start_date;
         const last_date = registros[(registros.length - 1)].start_date;
 
@@ -235,6 +239,10 @@ export class RegisterQuestionsService {
                 start_date: 'ASC'
             }
         });
+
+        if (registros.length == 0) {
+            return [];
+        }
 
         const first_date = registros[0].start_date;
         const last_date = registros[(registros.length - 1)].start_date;
