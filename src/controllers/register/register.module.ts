@@ -6,14 +6,14 @@ import { RegisterService } from './register.service';
 import { RegisterController } from './register.controller';
 import { Cycle } from '../cycle/cycle.entity';
 import { CycleModule } from '../cycle/cycle.module';
-import { RegisterQuestionsController } from './register-questions.controller';
-import { RegisterQuestionsService } from './register-questions.service';
-import { RegisterTimesController } from './register-times.controller';
-import { RegisterTimesService } from './register-times.service';
-import { RegisterAllQuestionsController } from './register-all-questions.controller';
-import { RegisterAllQuestionsService } from './register-all-questions.service';
-import { RegisterAllTimesController } from './register-all-times.constroller';
-import { RegisterAllTimesService } from './register-all-times.service';
+import { RegisterQuestionsController } from './questions/register-questions.controller';
+import { RegisterQuestionsService } from './questions/register-questions.service';
+import { RegisterTimesController } from './times/register-times.controller';
+import { RegisterTimesService } from './times/register-times.service';
+import { RegisterAllQuestionsController } from './allQuestions/register-all-questions.controller';
+import { RegisterAllQuestionsService } from './allQuestions/register-all-questions.service';
+import { RegisterAllTimesController } from './allTimes/register-all-times.constroller';
+import { RegisterAllTimesService } from './allTimes/register-all-times.service';
 @Module({
     imports: [
         forwardRef(() => CycleModule),

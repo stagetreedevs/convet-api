@@ -38,7 +38,12 @@ export class RegisterTimesController {
         @Param('user_id') user_id: string,
         @Param('code') code: string,
     ): Promise<any[]> {
-        return this.registerService.monthTimeByCode(user_id, code);
+        const monthArray = await this.registerService.monthTimeByCode(user_id, code);
+        const filteredArray = monthArray.map(item => ({
+            ...item,
+            weeks: item.weeks.filter(week => week.duration != "00:00:00")
+        }));
+        return filteredArray;
     }
 
     @Get(':user_id/:code/week')
@@ -47,7 +52,9 @@ export class RegisterTimesController {
         @Param('user_id') user_id: string,
         @Param('code') code: string,
     ): Promise<any[]> {
-        return this.registerService.weekTimeByCode(user_id, code);
+        const weekArray = await this.registerService.weekTimeByCode(user_id, code);
+        const filteredArray = weekArray.filter(week => week.week_duration != "00:00:00");
+        return filteredArray;
     }
 
     @Get(':user_id/:code/day')

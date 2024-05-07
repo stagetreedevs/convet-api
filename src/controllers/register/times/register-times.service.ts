@@ -3,8 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { add } from 'date-fns';
-import { Register } from './register.entity';
-import { RegisterQuestionsService } from './register-questions.service';
+import { Register } from '../register.entity';
+import { RegisterQuestionsService } from '../questions/register-questions.service';
 
 @Injectable()
 export class RegisterTimesService {

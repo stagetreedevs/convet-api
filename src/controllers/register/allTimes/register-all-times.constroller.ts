@@ -29,7 +29,15 @@ export class RegisterAllTimesController {
     async monthTime(
         @Param('user_id') user_id: string
     ): Promise<any> {
-        return this.registerService.monthTime(user_id);
+        const monthArray = await this.registerService.monthTime(user_id);
+        const filteredArray = monthArray.map(item => ({
+            ...item,
+            data: item.data.map(month => ({
+                ...month,
+                weeks: month.weeks.filter(week => week.duration != "00:00:00")
+            }))
+        }));
+        return filteredArray;
     }
 
     @Get(':user_id/week')
@@ -37,7 +45,12 @@ export class RegisterAllTimesController {
     async weekTime(
         @Param('user_id') user_id: string
     ): Promise<any> {
-        return this.registerService.weekTime(user_id);
+        const weekArray = await this.registerService.weekTime(user_id);
+        const filteredArray = weekArray.map(item => ({
+            ...item,
+            data: item.data.filter(week => week.week_duration != "00:00:00")
+        }));
+        return filteredArray;
     }
 
     @Get(':user_id/day')

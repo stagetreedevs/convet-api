@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Register } from './register.entity';
+import { Register } from '../register.entity';
 import { eachWeekOfInterval, endOfWeek, startOfWeek } from 'date-fns';
 @Injectable()
 export class RegisterQuestionsService {

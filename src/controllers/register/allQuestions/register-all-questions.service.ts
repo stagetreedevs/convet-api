@@ -2,17 +2,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Cycle } from '../cycle/cycle.entity';
-import { RegisterTimesService } from './register-times.service';
-
+import { Cycle } from '../../cycle/cycle.entity';
+import { RegisterQuestionsService } from '../questions/register-questions.service';
 @Injectable()
-export class RegisterAllTimesService {
+export class RegisterAllQuestionsService {
     constructor(
         @InjectRepository(Cycle) private readonly cycleService: Repository<Cycle>,
-        private readonly timesService: RegisterTimesService
+        private readonly registerQuestionService: RegisterQuestionsService
     ) { }
 
-    async totalTime(user: string) {
+    async totalQuestions(user: string) {
         const ciclo = await this.cycleService.findOne({ where: { user } });
 
         const codesSet = new Set<string>();
@@ -28,19 +27,16 @@ export class RegisterAllTimesService {
         const resolve = [];
 
         for (const materia of disciplinas) {
-            const objeto = {
-                materia: materia.name,
-                code: materia.code,
-                years: await this.timesService.totalTimeByCode(user, materia.code),
-                total: await this.timesService.totalTime(user, materia.code),
-            }
-            resolve.push(objeto);
+            const total = await this.registerQuestionService.totalQuesionsByCode(user, materia.code);
+            total.materia = materia.name;
+            total.code = materia.code;
+            resolve.push(total);
         }
 
-        return resolve;
+        return resolve.filter(item => item.sumQtdQuestions !== 0 && item.sumQuestionsHits !== 0);
     }
 
-    async yearTime(user: string) {
+    async yearQuestions(user: string) {
         const ciclo = await this.cycleService.findOne({ where: { user } });
 
         const codesSet = new Set<string>();
@@ -56,18 +52,16 @@ export class RegisterAllTimesService {
         const resolve = [];
 
         for (const materia of disciplinas) {
-            const objeto = {
-                materia: materia.name,
-                code: materia.code,
-                data: await this.timesService.yearTimeByCode(user, materia.code)
-            }
-            resolve.push(objeto);
+            const total = await this.registerQuestionService.yearQuestionsByCode(user, materia.code);
+            total.materia = materia.name;
+            total.code = materia.code;
+            resolve.push(total);
         }
 
-        return resolve;
+        return resolve.filter(item => item.sumQtdQuestions !== 0 && item.sumQuestionsHits !== 0);
     }
 
-    async monthTime(user: string) {
+    async monthQuestions(user: string) {
         const ciclo = await this.cycleService.findOne({ where: { user } });
 
         const codesSet = new Set<string>();
@@ -83,18 +77,21 @@ export class RegisterAllTimesService {
         const resolve = [];
 
         for (const materia of disciplinas) {
-            const objeto = {
-                materia: materia.name,
-                code: materia.code,
-                data: await this.timesService.monthTimeByCode(user, materia.code)
+            const total = await this.registerQuestionService.monthQuestionsByCode(user, materia.code);
+            if (total.length > 0) {
+                const json = {
+                    materia: materia.name,
+                    code: materia.code,
+                    data: total
+                }
+                resolve.push(json);
             }
-            resolve.push(objeto);
         }
 
         return resolve;
     }
 
-    async weekTime(user: string) {
+    async weekQuestions(user: string) {
         const ciclo = await this.cycleService.findOne({ where: { user } });
 
         const codesSet = new Set<string>();
@@ -110,18 +107,21 @@ export class RegisterAllTimesService {
         const resolve = [];
 
         for (const materia of disciplinas) {
-            const objeto = {
-                materia: materia.name,
-                code: materia.code,
-                data: await this.timesService.weekTimeByCode(user, materia.code)
+            const total = await this.registerQuestionService.weekQuestionsByCode(user, materia.code);
+            if (total.length > 0) {
+                const json = {
+                    materia: materia.name,
+                    code: materia.code,
+                    data: total
+                }
+                resolve.push(json);
             }
-            resolve.push(objeto);
         }
 
         return resolve;
     }
 
-    async dayTime(user: string) {
+    async dayQuestions(user: string) {
         const ciclo = await this.cycleService.findOne({ where: { user } });
 
         const codesSet = new Set<string>();
@@ -137,14 +137,18 @@ export class RegisterAllTimesService {
         const resolve = [];
 
         for (const materia of disciplinas) {
-            const objeto = {
-                materia: materia.name,
-                code: materia.code,
-                data: await this.timesService.dayTimeByCode(user, materia.code)
+            const total = await this.registerQuestionService.dayQuestionsByCode(user, materia.code);
+            if (total.length > 0) {
+                const json = {
+                    materia: materia.name,
+                    code: materia.code,
+                    data: total
+                }
+                resolve.push(json);
             }
-            resolve.push(objeto);
         }
 
         return resolve;
     }
+
 }

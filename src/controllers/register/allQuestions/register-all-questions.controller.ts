@@ -29,7 +29,15 @@ export class RegisterAllQuestionsController {
     async monthQuestions(
         @Param('user_id') user_id: string
     ): Promise<any> {
-        return this.registerService.monthQuestions(user_id);
+        const monthArray = await this.registerService.monthQuestions(user_id);
+        const filteredArray = monthArray.map(item => ({
+            ...item,
+            data: item.data.map(month => ({
+                ...month,
+                weeks: month.weeks.filter(week => week.total_qtd_questions > 0)
+            }))
+        }));
+        return filteredArray;
     }
 
     @Get('week/:user_id')
@@ -37,7 +45,12 @@ export class RegisterAllQuestionsController {
     async weekQuestions(
         @Param('user_id') user_id: string
     ): Promise<any> {
-        return this.registerService.weekQuestions(user_id);
+        const weekArray = await this.registerService.weekQuestions(user_id);
+        const filteredArray = weekArray.map(item => ({
+            ...item,
+            data: item.data.filter(week => week.sumQtdQuestions > 0)
+        }));
+        return filteredArray;
     }
 
     @Get('day/:user_id')

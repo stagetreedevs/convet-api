@@ -32,7 +32,12 @@ export class RegisterQuestionsController {
         @Param('user_id') user_id: string,
         @Param('code') code: string,
     ): Promise<any> {
-        return this.registerService.monthQuestionsByCode(user_id, code);
+        const monthArray = await this.registerService.monthQuestionsByCode(user_id, code);
+        const filteredArray = monthArray.map(item => ({
+            ...item,
+            weeks: item.weeks.filter(week => week.total_qtd_questions > 0)
+        }));
+        return filteredArray;
     }
 
     @Get('week/:user_id/:code')
@@ -41,7 +46,9 @@ export class RegisterQuestionsController {
         @Param('user_id') user_id: string,
         @Param('code') code: string,
     ): Promise<any> {
-        return this.registerService.weekQuestionsByCode(user_id, code);
+        const weekArray = await this.registerService.weekQuestionsByCode(user_id, code);
+        const filteredArray = weekArray.filter(week => week.sumQtdQuestions > 0);
+        return filteredArray;
     }
 
     @Get('day/:user_id/:code')
