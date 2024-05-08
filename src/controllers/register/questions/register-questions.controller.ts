@@ -32,7 +32,8 @@ export class RegisterQuestionsController {
         @Param('user_id') user_id: string,
         @Param('code') code: string,
     ): Promise<any> {
-        const monthArray = await this.registerService.monthQuestionsByCode(user_id, code);
+        const month = await this.registerService.monthQuestionsByCode(user_id, code);
+        const monthArray = month.filter(mes => mes.sumQtdQuestions > 0);
         const filteredArray = monthArray.map(item => ({
             ...item,
             weeks: item.weeks.filter(week => week.total_qtd_questions > 0)

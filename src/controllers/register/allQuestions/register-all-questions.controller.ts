@@ -32,10 +32,11 @@ export class RegisterAllQuestionsController {
         const monthArray = await this.registerService.monthQuestions(user_id);
         const filteredArray = monthArray.map(item => ({
             ...item,
-            data: item.data.map(month => ({
-                ...month,
-                weeks: month.weeks.filter(week => week.total_qtd_questions > 0)
-            }))
+            data: item.data.filter(item => item.sumQtdQuestions > 0).map(
+                month => ({
+                    ...month,
+                    weeks: month.weeks.filter(week => week.total_qtd_questions > 0)
+                }))
         }));
         return filteredArray;
     }

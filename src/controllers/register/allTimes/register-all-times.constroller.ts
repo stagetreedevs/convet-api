@@ -32,10 +32,11 @@ export class RegisterAllTimesController {
         const monthArray = await this.registerService.monthTime(user_id);
         const filteredArray = monthArray.map(item => ({
             ...item,
-            data: item.data.map(month => ({
-                ...month,
-                weeks: month.weeks.filter(week => week.duration != "00:00:00")
-            }))
+            data: item.data.filter(item => item.month_duration != "00:00:00").map(
+                month => ({
+                    ...month,
+                    weeks: month.weeks.filter(week => week.duration != "00:00:00")
+                }))
         }));
         return filteredArray;
     }

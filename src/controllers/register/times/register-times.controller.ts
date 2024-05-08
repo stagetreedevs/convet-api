@@ -38,7 +38,8 @@ export class RegisterTimesController {
         @Param('user_id') user_id: string,
         @Param('code') code: string,
     ): Promise<any[]> {
-        const monthArray = await this.registerService.monthTimeByCode(user_id, code);
+        const month = await this.registerService.monthTimeByCode(user_id, code);
+        const monthArray = month.filter(mes => mes.month_duration != "00:00:00");
         const filteredArray = monthArray.map(item => ({
             ...item,
             weeks: item.weeks.filter(week => week.duration != "00:00:00")
