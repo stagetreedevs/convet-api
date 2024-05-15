@@ -93,6 +93,18 @@ export class RegisterController {
     return this.registerService.findByCode(user_id, code);
   }
 
+  @Get('times/:user_id/sum')
+  @ApiOperation(
+    { 
+      summary: 'SOMA DE TODAS AS HORAS DO USUÁRIO', 
+      description: 'RETORNA A SOMA DE TODAS AS HORAS REGISTRADAS PELO USUÁRIO.' 
+    })
+  async totalUserTime(
+    @Param('user_id') user_id: string
+  ): Promise<any> {
+    return this.registerService.totalUserTime(user_id);
+  }
+
   @Get('questions/:user_id')
   @ApiOperation({ summary: 'QUESTÕES VIA ID DO USUÁRIO', description: 'RETORNA UM RESUMO DE TODAS AS QUESTÕES REGISTRADAS PELO USUÁRIO.' })
   async findForQuestion(@Param('user_id') user_id: string): Promise<any> {

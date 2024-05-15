@@ -409,6 +409,31 @@ export class RegisterService {
 
   }
 
+  async totalUserTime(user_id: string): Promise<any> {
+    const duracoes = await this.regRepository.find({
+      where: {
+        user: user_id,
+      },
+      select: ['duration'],
+    });
+
+    let totalDurationInSeconds = 0;
+
+    for (const registro of duracoes) {
+      const durationInSeconds = this.convertDurationToSeconds(registro.duration);
+      totalDurationInSeconds += durationInSeconds;
+    }
+
+    const res = {
+      id: user_id,
+      school_subject_code: '',
+      school_subject_name: 'Todas as matérias',
+      qtd_hours: this.convertSecondsToDuration(totalDurationInSeconds)
+    };
+
+    return res;
+  }
+
   async numberOfQuestions(user_id: string): Promise<any> {
     const registros = await this.regRepository.find({
       where: {
