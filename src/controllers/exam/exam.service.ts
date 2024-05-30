@@ -13,9 +13,9 @@ export class ExamService {
   ) { }
 
   async create(simulado: Exam): Promise<Exam> {
-    const codigo = await this.examRepository.findOne({ where: { contest_code: simulado.contest_code } });
+    const codigo = await this.findCodeVersion(simulado.contest_code, simulado.exam_number);
     if (codigo) {
-      throw new HttpException('Ja existe um simulado com este codigo', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Ja existe um simulado com este codigo nesta versão', HttpStatus.BAD_REQUEST);
     }
 
     return await this.examRepository.save(simulado);
@@ -37,6 +37,15 @@ export class ExamService {
     return this.examRepository.findOne({
       where: {
         contest_code: contest_code,
+      }
+    });
+  }
+
+  async findCodeVersion(contest_code: string, exam_number: number): Promise<Exam> {
+    return this.examRepository.findOne({
+      where: {
+        contest_code: contest_code,
+        exam_number: exam_number
       }
     });
   }
