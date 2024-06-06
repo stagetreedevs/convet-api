@@ -2,6 +2,12 @@
 /dist
 /node_modules
 
+# Environment variables
+.env
+
+# Certificates
+rds-ca-2019-root.pem
+
 # Logs
 logs
 *.log
